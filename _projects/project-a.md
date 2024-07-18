@@ -1,7 +1,7 @@
 ---
 name: Industrial Delta Robot
 tools: [ROS2, Kinematics, Machine Vision, 3D Printing, Solidworks, Arduino, Silicone Molding]
-image: '/portfolYOU/assets/images/delta.gif'
+image: '{{ site.baseurl }}/assets/images/delta.gif'
 description: This camera equipped delta robot can detect green tomatoes and separate them from the batch.
 ---
 
