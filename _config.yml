@@ -4,7 +4,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Let's make a rock walk.
 baseurl: ""  # the subpath of your site, e.g. /blog
 url: "https://bishaladhikari.info.np" # the base hostname & protocol for your site, e.g. http://example.com
-repository: WinnerBishal/myportflio
+repository: WinnerBishal/myportfolio
 
 # Build settings
 markdown: kramdown
