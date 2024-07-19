@@ -16,12 +16,12 @@
 
         // Horizontal Bar Variables
 // Variables
-$horizontal-bar-height: 150px;  // Height of the horizontal bar
+$horizontal-bar-height: 130px;  // Height of the horizontal bar
 $horizontal-bar-color: #c2ced1;  // Color of the horizontal bar
 
 body {
   position: relative;
-  background: url('../images/white.webp') no-repeat center center fixed;
+  background: url('../images/white.jpg') no-repeat center center fixed;
   background-size: cover;
 
   &::before {
