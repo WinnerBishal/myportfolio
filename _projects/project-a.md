@@ -7,7 +7,9 @@ peralink: /delta/
 ---
 
 
-
-# Industrial Delta Robot
-
+<div class = "center-text floating-rectangle">
+<h1> Industrial Delta Robot </h1>
+<p>
 A lot to tell here.
+</p>
+</div>

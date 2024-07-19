@@ -1,17 +1,11 @@
-- title: Student, Harvard CS
-  from: 2014
-  to: 2018
-  description: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-               Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-               nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-               reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-
-- title: Software Engineer, Google, UK
-  from: 2018
+- title: Research and Development Intern, Orion Space, Nepal
+  from: 2024
   to: present
-  description: Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-               Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-               nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-               reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+  description: I am currently working as a Research and Development Intern at Orion Space, Nepal. I designed and developed a torsion spring based solar panel deployment system in 1.5 PocketQube (a model satellite). I conducted dynamic characterization of the impact after the deployment and experimentally validated. More on the projects section !
+
+- title: Student, Tribhuvan University
+  from: 2020
+  to: 2024
+  description: I completed my Bachelors of Industrial Engineering from Thapathali Engineering Campus under Intitution of Engineering, Tribhuvan University.
+  
+

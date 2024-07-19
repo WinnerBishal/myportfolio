@@ -13,3 +13,55 @@
         "skills",
         "timeline",
         "404";
+
+        // Horizontal Bar Variables
+// Variables
+$horizontal-bar-height: 130px;  // Height of the horizontal bar
+$horizontal-bar-color: #c2ced1;  // Color of the horizontal bar
+
+body {
+  position: relative;
+  background: url('../images/space.jpg') no-repeat center center fixed;
+  background-size: cover;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $horizontal-bar-height;
+    background-color: $horizontal-bar-color;
+  }
+}
+
+.center-text {
+    text-align: center;
+  }
+  
+.center-text h1,
+.center-text h2,
+.center-text h3,
+.center-text h4,
+.center-text h5,
+.center-text h6 {
+text-align: center;
+}
+
+.floating-rectangle {
+    display: flex;
+    flex-direction: column; /* Arrange items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    width: 80%;
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.9);  /* Adjust the background color and transparency as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Add shadow for a floating effect */
+  }
+
+
+
+          

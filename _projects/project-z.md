@@ -1,7 +1,13 @@
 ---
-name: Project Z
-tools: [JavaScript]
+name: Odometry and Probabilistic C-Spaces
+tools: [Python]
 image:
-description: This project has no image, but it is still a beautiful project inside out!
-external_url: https://www.google.com
+description: We must know where we are, where we can be and where we cannot.
 ---
+
+<div class = "center-text floating-rectangle">
+<h1>Odometry and Probabilistic C-Spaces</h1>
+<p>
+Subtle Ideas
+</p>
+</div>
