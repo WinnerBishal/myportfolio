@@ -6,12 +6,13 @@ description: I will ask random neighbors (probably neighbors in the direction of
 permalink: /rrt/
 ---
 
-<div class = "center-text floating-rectangle">
+<!-- <div class = "center-text floating-rectangle">
 <h1>Rapidly-exploring Random Trees</h1>
 
 <p>
 Things from scratch
 </p> 
+</div> -->
+<div class = "center-text floating-rectangle">
+<iframe src="/assets/html/RRT Article.html" width="100%" height="900px" style="border:none;"></iframe>
 </div>
-
-<iframe src="assets/docs/RRT Article.html" width="100%" height="800px" style="border:none;"></iframe>
