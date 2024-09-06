@@ -13,6 +13,6 @@ permalink: /rrt/
 Things from scratch
 </p> 
 </div> -->
-<div class = "center-text floating-rectangle">
-<iframe src="/assets/html/RRT Article.html" width="100%" height="900px" style="border:none;"></iframe>
-</div>
+<!-- <div class = "center-text floating-rectangle">
+</div> -->
+<iframe src="/assets/html/RRT Article.html" width="1000px" height="900px" style="border:none; border-radius: 15px;       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);"></iframe>
