@@ -2,7 +2,7 @@
 layout: page
 title: About
 permalink: /about/
-weight: 2
+weight: 1
 ---
 
 <div class="center-text floating-rectangle">
