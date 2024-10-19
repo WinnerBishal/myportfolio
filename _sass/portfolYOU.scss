@@ -48,21 +48,6 @@ body {
 text-align: center;
 }
 
-.floating-rectangle {
-    display: flex;
-    flex-direction: column; /* Arrange items vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
-    width: 100%;
-    max-width: 1500px; /* Adjust as needed */
-    height: 800px; /* Adjust as needed */
-    margin: 50px auto;
-    padding: 10px;
-    border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.9);  /* Adjust the background color and transparency as needed */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Add shadow for a floating effect */
-  }
-
 .delta-page-background {
   background-color: #f4f4f9; /* Light gray, clean background */
   padding: 20px; /* Adds space around your content */
@@ -70,6 +55,30 @@ text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
+.floating-rectangle {
+  display: flex;
+  flex-direction: column; /* Arrange items vertically */
+  align-items: center; /* Center items horizontally */
+  justify-content: center; /* Center items vertically */
+  width: 100%;
+  max-width: 1500px; /* Adjust as needed */
+  height: 800px; /* Adjust as needed */
+  margin: 50px auto;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.9);  /* Adjust the background color and transparency as needed */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Add shadow for a floating effect */
+}
 
+.bg-delta-img {
+  background-image: url('/assets/images/delta.jpg'); /* Update with the correct path to your image */
+  background-size: cover; /* Ensures the image covers the entire area */
+  background-position: center; /* Centers the image within the element */
+  width: 100%;
+  max-width: auto; /* Match the width of the floating rectangle */
+  height: 800px; /* Match the height of the floating rectangle */
+  border-radius: 15px; /* Match the border radius of the floating rectangle */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Match the shadow of the floating rectangle */
+}
 
           
