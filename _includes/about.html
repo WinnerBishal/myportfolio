@@ -1,11 +1,11 @@
-<div class="center-text floating-rectangle">
+<div class="center-text bg-delta-img">
 
   <img src="/assets/images/propic.png" alt="Description of the image" style="max-width: 604px; height: 412px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 
   <p>I graduated as an Industrial Engineer. I like building, studying and learning about intelligent systems.</p>
   
   <button onclick="openPDF()" class="styled-button">
-      RESUME
+      RESUME RESEARCH
   </button>
 
   <script>
@@ -13,6 +13,16 @@
           window.open('/assets/resume.pdf', '_blank');
       }
   </script>
+
+<button onclick="openPDF()" class="styled-button">
+    RESUME WORK
+</button>
+
+<script>
+    function openPDF() {
+        window.open('/assets/work_resume.pdf', '_blank');
+    }
+</script>
 
 </div>
 
