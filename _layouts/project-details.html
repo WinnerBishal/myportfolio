@@ -1,0 +1,103 @@
+---
+layout: default
+---
+
+{% if page.use_math %}
+<!-- MathJax Configuration -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true
+  },
+  "HTML-CSS": { 
+    fonts: ["TeX"]
+  }
+});
+</script>
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+{% endif %}
+
+<div class="col-lg-10 mx-auto mt-5 project-details">
+  <div class="project-content">
+    {{ content }}
+  </div>
+</div>
+
+<style>
+  .project-details {
+    font-family: 'Source Serif Pro', 'Georgia', serif;
+  }
+
+  .project-content {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin: 2rem 0;
+  }
+
+  /* Headers */
+  .project-content h1,
+  .project-content h2,
+  .project-content h3 {
+    font-family: 'Merriweather', 'Times New Roman', serif;
+    color: var(--heading-color);
+    margin-top: 1.5rem;
+  }
+
+  /* Links */
+  .project-content a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .project-content a:hover {
+    text-decoration: underline;
+  }
+
+  /* Code blocks */
+  .project-content code {
+    background-color: #e8f5e9;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Source Code Pro', monospace;
+  }
+
+  /* Lists */
+  .project-content ul {
+    padding-left: 1.5rem;
+  }
+
+  /* Media */
+  .project-content img,
+  .project-content video {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: block;
+  }
+
+  /* Center video div */
+  .project-content div[style*="text-align: center"] {
+    margin: 2rem 0;
+  }
+
+  /* Dark Mode */
+  [data-theme="dark"] .project-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+  }
+
+  [data-theme="dark"] .project-content code {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
+
+  [data-theme="dark"] .project-content a {
+    color: #58a6ff;
+  }
+</style> 
