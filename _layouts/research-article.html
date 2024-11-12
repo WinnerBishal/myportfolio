@@ -1,0 +1,139 @@
+---
+layout: default
+---
+
+<!-- Add Font Awesome CDN in head -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="col-lg-10 mx-auto mt-5 post">
+  <!-- Main Content Box -->
+  <div style="background-color: #e8f5e9; padding: 20px; margin: 20px 0; text-align: justify; font-family: 'Source Serif Pro', 'Georgia', serif;">
+    <!-- Title -->
+    <h3 style="font-family: 'Merriweather', 'Times New Roman', serif; margin-bottom: 1.5rem;">
+      {{ page.article_title }}
+    </h3>
+
+    <!-- Tags -->
+    <div style="margin-bottom: 1.5rem;">
+      {% for tag in page.tags %}
+        {% comment %} Default Styles {% endcomment %}
+        {% assign card_style = '' %}
+        {% assign text_style = 'text-dark' %}
+        {% assign badge_style = 'badge-dark' %}
+        
+        {% comment %} Update Styles {% endcomment %}
+        {% if post.style == 'fill' %}
+          {% assign card_style = post.color | prepend: 'bg-' %}
+          {% if post.color != 'light' %}
+            {% assign text_style = 'text-white' %}
+            {% assign badge_style = 'badge-light text-' %}
+            {% assign badge_style = badge_style | append: post.color %}
+          {% endif %}
+        {% else %}
+          {% assign card_style = post.color | prepend: 'border border-' %}
+          {% if post.color %}
+            {% assign badge_style =  post.color | prepend: 'badge-' %}
+          {% endif %}
+        {% endif %}
+
+        <span class="badge {{ badge_style }}" 
+              style="font-size: 1.1rem; padding: 8px 12px; margin-right: 8px;">{{ tag }}</span>
+      {% endfor %}
+    </div>
+
+    <!-- Authors -->
+    <div class="authors-section" style="margin-bottom: 2rem;">
+      {% assign author_count = page.authors | size %}
+      {% for author in page.authors %}
+        <span style="display: inline;">
+          {{ author.name }}
+          {% if author.orcid %}
+            <a href="https://orcid.org/{{ author.orcid }}" target="_blank" aria-label="ORCID Profile" class="author-icon">
+              <i class="fab fa-orcid" style="color: #A6CE39;"></i>
+            </a>
+          {% endif %}
+          {% if author.email %}
+            <a href="mailto:{{ author.email }}" target="_blank" aria-label="Email" class="author-icon">
+              <i class="fas fa-envelope" style="color: #2c3e50;"></i>
+            </a>
+          {% endif %}
+        </span>
+        {% if forloop.last == false %}
+          {% if author_count == 2 %}
+            and
+          {% else %}
+            {% if forloop.rindex0 == 1 %}
+              , and
+            {% else %}
+              ,
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Abstract -->
+    <h2 style="font-weight: bold; font-style: italic; font-family: 'Merriweather', 'Times New Roman', serif;">
+      Abstract
+    </h2>
+    {{ page.abstract }}
+  </div>
+
+  <!-- Find More Button -->
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="{{ page.paper_url }}" target="_blank" class="styled-button">Find More</a>
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+  .author-icon {
+    margin: 0 5px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .author-icon:hover {
+    opacity: 0.8;
+  }
+
+  .author-icon i {
+    font-size: 1rem;
+  }
+
+  .badge {
+    font-size: 1.1rem !important;
+    padding: 8px 12px !important;
+    margin-right: 8px !important;
+    font-family: 'Source Serif Pro', 'Georgia', serif !important;
+  }
+
+  .styled-button {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background-color: #2c3e50;
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 2px solid #2c3e50;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-family: 'Source Serif Pro', 'Georgia', serif;
+  }
+
+  .styled-button:hover {
+    background-color: #34495e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border-color: #34495e;
+  }
+
+  .styled-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+</style> 
