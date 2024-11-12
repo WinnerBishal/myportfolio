@@ -1,92 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Me</title>
-  <link rel="stylesheet" href="/assets/css/style.css">
-  <style>
-    body {
-      background-color: #f4f4f904; /* Light gray background */
-      font-family: Arial, sans-serif; /* Default font */
-      color: #333; /* Text color */
-      margin: 0;
-      padding: 0;
-    }
 
-    .container {
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: #ffffff00; /* White background for the container */
-      border-radius: 0px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-      text-align: center;
-    }
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
-    .round-frame {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
+  .about-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    text-align: center;
+  }
 
-    .profile-name {
-      font-size: 2.0em;
-      margin: 0;
-      color: #150202; /* Blue color for the name */
-    }
+  .round-frame {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
 
-    .profile-designation {
-      font-size: 1.2em;
-      margin: 0;
-      color: #555; /* Gray color for the designation */
-    }
+  .profile-name {
+    font-family: 'Merriweather', 'Times New Roman', serif;
+    font-size: 2.0em;
+    margin: 0;
+    color: #150202;
+    font-weight: 700;
+  }
 
-    p {
-      font-size: 1em;
-      line-height: 1.6;
-      margin: 20px 0;
-    }
+  .profile-designation {
+    font-family: 'Source Serif Pro', Georgia, serif;
+    font-size: 1.2em;
+    margin: 15px 0;
+    color: #555;
+    font-style: italic;
+  }
 
-    .styled-button {
-      padding: 12px 24px;
-      border-radius: 8px;
-      background-color: #4a6480;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.3s ease;
-    }
+  .about-text {
+    font-family: 'Source Serif Pro', Georgia, serif;
+    font-size: 1.1em;
+    line-height: 1.8;
+    margin: 25px 0;
+    text-align: justify;
+    color: #2c3e50;
+  }
 
-    .styled-button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <img src="/assets/images/bishal_dv.jpg" alt="Bishal Adhikari" class="round-frame">
+  .styled-button {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background-color: #2c3e50;
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 2px solid #2c3e50;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-family: 'Source Serif Pro', Georgia, serif;
+    cursor: pointer;
+    margin-top: 20px;
+  }
 
-    <div class="profile-info">
-      <h1 class="profile-name">I'm BISHAL ADHIKARI</h1>
-      <p class="profile-designation">Industrial Engineer | Robotics Researcher</p>
-    </div>
+  .styled-button:hover {
+    background-color: #34495e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border-color: #34495e;
+  }
 
-    <p>I graduated as an Industrial Engineer from IOE, Tribhuvan University. I like building and studying intelligent mechanical systems. I want to pursue a research career speacilizing in mechanical engineering applications in robotics.</p>
+  .styled-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+</style>
 
-    <button onclick="openPDF()" class="styled-button">
-      View CV
-    </button>
+<div class="about-container">
+  <img src="/assets/images/bishal_dv.jpg" alt="Bishal Adhikari" class="round-frame">
 
-    <script>
-      function openPDF() {
-        window.open('/assets/resume.pdf', '_blank');
-      }
-    </script>
-
+  <div class="profile-info">
+    <h1 class="profile-name">I'm BISHAL ADHIKARI</h1>
+    <p class="profile-designation">Industrial Engineer | Robotics Researcher</p>
   </div>
-</body>
-</html>
+
+  <p class="about-text">I graduated as an Industrial Engineer from IOE, Tribhuvan University. I like building and studying intelligent mechanical systems. I want to pursue a research career specializing in mechanical engineering applications in robotics.</p>
+
+  <button onclick="openPDF()" class="styled-button">
+    View CV
+  </button>
+
+  <script>
+    function openPDF() {
+      window.open('/assets/resume.pdf', '_blank');
+    }
+  </script>
+</div>

@@ -8,6 +8,11 @@
 
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav ml-auto">
+      <div class="nav-item">
+        <button id="theme-toggle" class="btn btn-link nav-link">
+          <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
       {% assign pages = site.html_pages | sort: 'weight' %}
       {% for site_page in pages %}
         {% if site_page.title %}
