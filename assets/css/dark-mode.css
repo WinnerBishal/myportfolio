@@ -1,0 +1,262 @@
+/* Theme Variables */
+[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --horizontal-bar-color: #2d2d2d;
+  --about-bg: rgba(45, 45, 45, 0.7);
+  --card-bg: #2d2d2d;
+  --border-color: #444;
+
+  /* Override h-100 if needed */
+  .h-100 {
+    height: auto !important;
+  }
+}
+
+/* Main background */
+[data-theme="dark"] body {
+  background: url('../images/dark.jpg') no-repeat center center fixed !important;
+  background-size: cover !important;
+}
+
+[data-theme="dark"] body::before {
+  background-color: var(--horizontal-bar-color) !important;
+}
+
+/* About page specific styles */
+[data-theme="dark"] .about-container {
+  background-color: var(--about-bg) !important;
+}
+
+[data-theme="dark"] .profile-name {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .profile-designation {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .about-text {
+  color: var(--text-color) !important;
+}
+
+/* Navbar styles */
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .navbar-light {
+  background-color: var(--horizontal-bar-color) !important;
+}
+
+[data-theme="dark"] .navbar-light .navbar-nav .nav-link {
+  color: var(--text-color) !important;
+}
+
+/* Button styles */
+[data-theme="dark"] .styled-button {
+  background-color: #2d333b !important;
+  color: #e6edf3 !important;
+  border: 1px solid #444d56 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+
+  &:hover {
+    background-color: #444d56 !important;
+    border-color: #768390 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    text-decoration: none !important;
+  }
+
+  &:active {
+    background-color: #373e47 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+/* 1. Navbar Brand (Bishal Adhikari) */
+[data-theme="dark"] .navbar-light .navbar-brand {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .navbar-light .navbar-brand:hover {
+  color: #ffffff !important;
+}
+
+/* 2. Project Cards */
+[data-theme="dark"] .project.card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .project.card .card-body {
+  background-color: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .project.card .card-title {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .project.card .card-text {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .badge.badge-pill.text-primary.border.border-primary {
+  color: #58a6ff !important;
+  border-color: #58a6ff !important;
+}
+
+/* 3. Research Cards */
+[data-theme="dark"] .article.card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .article.card .card-body {
+  background-color: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .article.card .card-title {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .article.card .card-text {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .article.card .card-footer {
+  background-color: var(--card-bg) !important;
+  border-top-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .badge.badge-dark {
+  background-color: #2d333b !important;
+  color: #e6edf3 !important;
+  border: 1px solid #444d56 !important;
+}
+
+/* Research Article Page Styles */
+[data-theme="dark"] {
+  /* Main Content Box */
+  .post {
+    .col-lg-10 {
+      background-color: var(--card-bg) !important;
+    }
+
+    /* Override the light green background */
+    div[style*="background-color: #e8f5e9"] {
+      background-color: var(--card-bg) !important;
+      color: var(--text-color) !important;
+    }
+
+    /* Title */
+    h3 {
+      color: var(--text-color) !important;
+    }
+
+    /* Abstract heading */
+    h2 {
+      color: var(--text-color) !important;
+    }
+
+    /* Abstract content */
+    p {
+      color: var(--text-color) !important;
+    }
+
+    /* Authors section */
+    .authors-section {
+      color: var(--text-color) !important;
+
+      /* Keep ORCID icon color */
+      .fa-orcid {
+        color: #A6CE39 !important;
+      }
+
+      /* Adjust email icon color */
+      .fa-envelope {
+        color: #58a6ff !important;
+      }
+    }
+
+    /* Tags */
+    .badge-dark {
+      background-color: #2d333b !important;
+      color: #e6edf3 !important;
+      border: 1px solid #444d56 !important;
+    }
+
+    /* Find More Button */
+    .styled-button {
+      background-color: #58a6ff !important;
+      border-color: #58a6ff !important;
+      color: var(--bg-color) !important;
+
+      &:hover {
+        background-color: #2188ff !important;
+        border-color: #2188ff !important;
+      }
+    }
+
+    /* Super specific selector for Find More button in research articles */
+    .post .col-lg-10 .styled-button,
+    .post div[style*="text-align: center"] .styled-button {
+      background-color: #2d333b !important;
+      color: #e6edf3 !important;
+      border: 1px solid #444d56 !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+    }
+
+    .post .col-lg-10 .styled-button:hover,
+    .post div[style*="text-align: center"] .styled-button:hover {
+      background-color: #444d56 !important;
+      border-color: #768390 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px) !important;
+      text-decoration: none !important;
+    }
+
+    .post .col-lg-10 .styled-button:active,
+    .post div[style*="text-align: center"] .styled-button:active {
+      background-color: #373e47 !important;
+      transform: translateY(0) !important;
+    }
+  }
+}
+
+/* Unified Button Styling for both Find More and View CV buttons */
+.styled-button,
+.about-container .styled-button,
+.post .col-lg-10 .styled-button,
+.post div[style*="text-align: center"] .styled-button {
+  background-color: #2d333b !important;
+  color: #e6edf3 !important;
+  border: 1px solid #444d56 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.styled-button:hover,
+.about-container .styled-button:hover,
+.post .col-lg-10 .styled-button:hover,
+.post div[style*="text-align: center"] .styled-button:hover {
+  background-color: #444d56 !important;
+  border-color: #768390 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+.styled-button:active,
+.about-container .styled-button:active,
+.post .col-lg-10 .styled-button:active,
+.post div[style*="text-align: center"] .styled-button:active {
+  background-color: #373e47 !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+}
+

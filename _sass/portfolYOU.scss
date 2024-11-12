@@ -81,4 +81,10 @@ text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Match the shadow of the floating rectangle */
 }
 
+/* Prevent flash of unstyled content */
+html[data-theme="dark"] {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
           
