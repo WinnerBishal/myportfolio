@@ -2,16 +2,9 @@
 name: Odometry, Mapping and Probabilistic C-Spaces
 tools: [Python]
 image: "/assets/images/nav_map.gif"
-
 description: We must know where we are, where we can be and where we cannot.
+layout: project-details
 ---
-
-<!-- <div class = "center-text floating-rectangle">
-<h1>Odometry, Mapping and Probabilistic C-Spaces</h1>
-<p>
-Subtle Ideas
-</p>
-</div> -->
 
 <div style="text-align: center;">
   <video width="600" controls>
