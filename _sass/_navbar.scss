@@ -1,15 +1,22 @@
+$link-after-height: 0.15em;
+
 .link-after {
     content: '';
     display: block;
-    height: .15em;
+    height: $link-after-height;
     background: $primary;
 }
 
 .nav-link, .navbar-brand {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+
     &::after {
         @extend .link-after;
         width: 0;
-        transition: width .35s;
+        transition: width 0.35s;
     }
 
     &:hover::after {
@@ -19,16 +26,17 @@
 
 .nav-item.active {
     font-weight: bold;
-    
+
     &::after {
         @extend .link-after;
-        width: 100%!important;
+        width: 100% !important;
     }
 }
 
 .navbar-brand {
     margin-bottom: -14px;
+
     &::after {
-        margin-top: -.25em;
+        margin-top: -0.25em;
     }
 }

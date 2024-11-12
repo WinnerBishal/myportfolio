@@ -1,4 +1,3 @@
-
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 
@@ -73,6 +72,31 @@
     transform: translateY(0);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    color: #0077b5;  /* LinkedIn blue */
+    transition: all 0.3s ease;
+  }
+
+  .social-link:hover {
+    transform: translateY(-2px);
+    color: #005582;  /* Darker blue on hover */
+  }
+
+  .social-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .designation-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
 </style>
 
 <div class="about-container">
@@ -80,7 +104,16 @@
 
   <div class="profile-info">
     <h1 class="profile-name">I'm BISHAL ADHIKARI</h1>
-    <p class="profile-designation">Industrial Engineer | Robotics Researcher</p>
+    <div class="designation-container">
+      <p class="profile-designation">Industrial Engineer | Robotics Researcher |
+      <a href="https://www.linkedin.com/in/bishal-adhikari-bie/" 
+         target="_blank" 
+         class="social-link" 
+         title="Connect on LinkedIn">
+         <i class="fab fa-linkedin social-icon" style="color: #0A66C2; font-size: 1.2em; transform: translateX(-10px); "></i>
+      </a>
+    </p>
+    </div>
   </div>
 
   <p class="about-text">I graduated as an Industrial Engineer from IOE, Tribhuvan University. I like building and studying intelligent mechanical systems. I want to pursue a research career specializing in mechanical engineering applications in robotics.</p>
