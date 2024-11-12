@@ -1,6 +1,6 @@
 ---
 name: RRT Path Planning Algorithm
-tools: [Python, ROS, Gazebo]
+tools: [Python]
 image: /assets/images/rrt_2.gif
 description: Implementation of RRT Path Planning Algorithm in Python and ROS
 layout : project-details

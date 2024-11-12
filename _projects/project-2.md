@@ -1,6 +1,6 @@
 ---
 name: Odometry, Mapping and Probabilistic C-Spaces
-tools: [Python]
+tools: [Python, LiDAR, IMU, PD Controller, Webots]
 image: "/assets/images/nav_map.gif"
 description: We must know where we are, where we can be and where we cannot.
 layout: project-details
