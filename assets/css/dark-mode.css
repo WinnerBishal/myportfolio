@@ -11,6 +11,166 @@
   .h-100 {
     height: auto !important;
   }
+
+  /* Delta Robot Calculator Page Styles */
+  .floating-rectangle {
+    background-color: var(--card-bg) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin: 20px 0 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Page title, headings and content text */
+  .page-content {
+    h1, h2, h3, h4, h5, h6,
+    p, span, div,
+    li, ul, ol {
+      color: var(--text-color) !important;
+    }
+  }
+
+  /* iframe container */
+  .center-text {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+  }
+
+  /* iframe styles */
+  .center-text iframe {
+    background-color: var(--card-bg) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Delta Robot Calculator Page */
+  .content-container {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .header-text {
+    h1, p {
+      color: var(--text-color) !important;
+    }
+  }
+
+  .calculator-frame {
+    background-color: var(--card-bg) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Project Cards Container */
+  .card-columns {
+    background-color: transparent !important;
+  }
+
+  /* Individual Project Cards */
+  .project.card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    overflow: hidden !important;
+  }
+
+  /* Remove any unwanted backgrounds from containers */
+  .container-fluid,
+  .container,
+  main.h-100 {
+    background-color: transparent !important;
+  }
+
+  /* Research Article Cards */
+  .post-preview {
+    background-color: var(--card-bg) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Container fixes */
+  .posts-wrapper,
+  .posts-container {
+    background-color: transparent !important;
+  }
+
+  /* Remove any unwanted backgrounds */
+  .container-fluid,
+  .container,
+  main.h-100,
+  .page-content {
+    background-color: transparent !important;
+  }
+
+  /* Fix for research article cards */
+  .card-bg {
+    background-color: var(--card-bg) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Article Cards */
+  .article.card {
+    background-color: var(--card-bg) !important;
+    border-radius: 12px !important;
+    border-color: var(--border-color) !important;
+    
+    /* Card Body */
+    .card-body {
+      color: var(--text-color) !important;
+    }
+
+    /* Card Title */
+    .card-title {
+      color: var(--text-color) !important;
+    }
+
+    /* Card Text */
+    .card-text {
+      color: var(--text-color) !important;
+    }
+
+    /* Card Footer */
+    .card-footer {
+      background-color: rgba(0, 0, 0, 0.1) !important;
+      border-top: 1px solid var(--border-color) !important;
+      color: var(--text-color) !important;
+    }
+
+    /* Badges */
+    .badge {
+      background-color: #2d333b !important;
+      color: #e6edf3 !important;
+      border: 1px solid #444d56 !important;
+    }
+
+    /* Hover State */
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+      text-decoration: none !important;
+    }
+  }
+
+  /* Override text colors for filled cards */
+  .article.card.bg-primary,
+  .article.card.bg-secondary,
+  .article.card.bg-success,
+  .article.card.bg-danger,
+  .article.card.bg-warning,
+  .article.card.bg-info,
+  .article.card.bg-dark {
+    .card-body,
+    .card-title,
+    .card-text,
+    .card-footer {
+      color: #ffffff !important;
+    }
+  }
 }
 
 /* Main background */
@@ -103,36 +263,6 @@
 [data-theme="dark"] .badge.badge-pill.text-primary.border.border-primary {
   color: #58a6ff !important;
   border-color: #58a6ff !important;
-}
-
-/* 3. Research Cards */
-[data-theme="dark"] .article.card {
-  background-color: var(--card-bg) !important;
-  border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .article.card .card-body {
-  background-color: var(--card-bg) !important;
-}
-
-[data-theme="dark"] .article.card .card-title {
-  color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .article.card .card-text {
-  color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .article.card .card-footer {
-  background-color: var(--card-bg) !important;
-  border-top-color: var(--border-color) !important;
-  color: var(--text-color) !important;
-}
-
-[data-theme="dark"] .badge.badge-dark {
-  background-color: #2d333b !important;
-  color: #e6edf3 !important;
-  border: 1px solid #444d56 !important;
 }
 
 /* Research Article Page Styles */
