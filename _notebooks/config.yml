@@ -1,0 +1,14 @@
+notebooks:
+  rrt_analysis:
+    name: "RRT Algorithm Analysis and Implementation"
+    tools: ["Python", "Robotics", "Path Planning"]
+    description: "Detailed analysis and implementation of RRT algorithm with visualizations"
+    image: "/assets/images/rrt_2.gif"
+    permalink: /rrt_analysis/
+  
+  delta_kinematics:
+    name: "Delta Robot Kinematics Calculator"
+    tools: ["Python", "Robotics", "Kinematics"]
+    description: "Forward and inverse kinematics analysis of delta robot"
+    image: "/assets/images/delta.gif"
+    permalink: /delta_kinematics/

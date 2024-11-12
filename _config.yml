@@ -8,6 +8,8 @@ repository: WinnerBishal/myportfolio
 
 # Build settings
 markdown: kramdown
+kramdown:
+  math_engine: mathjax
 plugins:
   - jekyll-feed
   - jekyll-sitemap

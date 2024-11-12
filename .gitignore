@@ -7,3 +7,7 @@ _site/
 # To generate Gemfile.lock -> use: $ bundle install
 # If unknown encoding name CP720 Error occured -> use: $ chcp.com 1252
 Gemfile.lock
+
+# Jupyter Notebook
+.ipynb_checkpoints
+__pycache__/
