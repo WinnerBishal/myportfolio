@@ -15,7 +15,7 @@
       </div>
       {% assign pages = site.html_pages | sort: 'weight' %}
       {% for site_page in pages %}
-        {% if site_page.title %}
+        {% if site_page.title and site_page.nav_exclude != true %}
           <a class="nav-item nav-link {% if page.url contains site_page.permalink %} active {% endif %}" href="{% if site_page.external_url %} {{ site_page.external_url }} {% else %} {{ site_page.permalink | relative_url }} {% endif %}">{{ site_page.title }}</a>
         {% endif %}
       {% endfor %}

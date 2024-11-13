@@ -61,3 +61,5 @@ exclude:
 - LICENSE
 - Gemfile
 - Gemfile.lock
+
+include: ['_pages']
