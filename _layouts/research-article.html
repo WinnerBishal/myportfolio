@@ -81,7 +81,19 @@ layout: default
 
   <!-- Find More Button -->
   <div style="text-align: center; margin-top: 20px;">
-    <a href="{{ site.baseurl }}/request" class="styled-button">Find More</a>
+    {% if page.read_more_type == 'external' %}
+      <a href="{{ page.read_more_url }}" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="styled-button">
+        Read Full Article 
+        <i class="fas fa-external-link-alt" style="margin-left: 8px; font-size: 0.9em;"></i>
+      </a>
+    {% else %}
+      <a href="{{ site.baseurl }}/request" class="styled-button">
+        Request Full Article
+      </a>
+    {% endif %}
   </div>
 </div>
 

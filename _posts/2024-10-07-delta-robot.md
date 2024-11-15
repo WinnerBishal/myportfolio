@@ -11,6 +11,7 @@ authors:
   - name: Madan Shrestha
     orcid: 0000-0002-YYYY-YYYY
     email: john@example.com
+read_more_type: internal
 tags: [In Review]
 style: fill
 color: light
