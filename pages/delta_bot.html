@@ -1,0 +1,146 @@
+---
+layout: page
+title: DeltaRobot KineCalc
+permalink: /delta_kinematics_calculator/
+weight: 4
+---
+
+<div class="content-container">
+  <div class="header-text">
+    <h1>Delta Robot Kinematics Calculator</h1>
+    <p>With this tool, you can plan the dimensions of your robot, visualize the movement of end effector of delta robot based on joint parameters and also visualize the joint trajectory of motor for a given spline path.</p>
+  </div>
+
+  <div class="calculator-link-container">
+    <p class="info-text">Access the Delta Robot Calculator by clicking the button below:</p>
+    
+    <a href="https://delta-robot.streamlit.app" target="_blank" class="calculator-button">
+      <i class="fas fa-calculator"></i>
+      Open Delta Robot Calculator
+    </a>
+    
+    <p class="note-text">Note: The calculator will open in a new tab</p>
+  </div>
+</div>
+
+<style>
+  .content-container {
+    padding: 40px;
+    margin: 20px 0;
+    border-radius: 12px;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .header-text {
+    margin-bottom: 40px;
+  }
+
+  .header-text h1 {
+    color: var(--text-color);
+    font-size: 2.2em;
+    margin-bottom: 20px;
+  }
+
+  .header-text p {
+    color: var(--text-color);
+    font-size: 1.1em;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .calculator-link-container {
+    padding: 30px;
+    background-color: rgba(var(--card-bg-rgb), 0.5);
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 600px;
+  }
+
+  .info-text {
+    color: var(--text-color);
+    font-size: 1.2em;
+    margin-bottom: 25px;
+  }
+
+  .calculator-button {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .calculator-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: white;
+  }
+
+  .calculator-button i {
+    margin-right: 10px;
+  }
+
+  .note-text {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-top: 15px;
+  }
+
+  /* Dark mode support */
+  [data-theme="dark"] .calculator-button {
+    background-color: #58a6ff;
+  }
+
+  [data-theme="dark"] .calculator-button:hover {
+    background-color: #1f6feb;
+  }
+
+  [data-theme="dark"] .calculator-link-container {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const iframe = document.getElementById('deltaRobotFrame');
+    const spinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    let retryCount = 0;
+    const maxRetries = 2;
+
+    function loadIframe() {
+        iframe.style.opacity = '0';
+        spinner.style.display = 'block';
+        errorMessage.style.display = 'none';
+
+        iframe.onload = function() {
+            setTimeout(() => {
+                iframe.style.opacity = '1';
+                spinner.style.display = 'none';
+            }, 1000);
+        };
+
+        iframe.onerror = function() {
+            if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(loadIframe, 2000);
+            } else {
+                spinner.style.display = 'none';
+                errorMessage.style.display = 'block';
+            }
+        };
+    }
+
+    loadIframe();
+});
+</script> 
