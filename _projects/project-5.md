@@ -1,4 +1,102 @@
 ---
+name: Drone Physics Simulation
+tools: [Python, Quadrotor Dynamics, In Progress]
+image: "/assets/images/drone_dynamics.gif"
+description: This project uses Newton-Euler's equation to model drone physics and uses python for simulation.
+layout: project-details
+permalink: /dronedyn/
+---
+
+## Description
+
+The **Drone Dynamics Visualizer** is an interactive simulation tool designed to model and visualize the dynamics of a quadcopter drone. The project provides a real-time visual interface to simulate drone physics, including translational and rotational motion, using Tkinter and Matplotlib. The application is equipped with user controls for rotor speed adjustments and the ability to record the simulation for video playback.
+
+This serves as a simulation environment for an ongoing project : RL Based Drone Navigation Project [Github](https://github.com/adhikariprajitraj/3D-Drone-Navigation-Project).
+
+## Dynamics of Quadrotor
+
+The quadrotor dynamics are modeled using Newton-Euler equations of motion, accounting for gravitational force, thrust force and torques applied by the four rotors. **Thanks to the fantastic lecture at** [Youtube](https://youtu.be/xCoFaTyn5dg?si=maYhMO44H1Hx8usr)
+
+Here are the key equations:
+
+### Symbols
+
+| Symbol         | Description                            |
+|----------------|----------------------------------------|
+| \( x, y, z \)           | Position coordinates in 3D space    |
+| \( u, v, w \)           | Velocity components along \(x, y, z\)|
+| \( $\phi$, $\theta$, $\psi$ \) | Roll, pitch, and yaw angles        |
+| \( $\omega_1$, $\omega_2$, $\omega_3$, $\omega_4$ \) | Rotor speeds |
+| \( l \)        | Distance from the center to each rotor |
+| \( b \)        | Torque constant                        |
+| \( k \)        | Aerodynamic constant                   |
+| \( $I_x$, $I_y$, $I_z$ \)     | Moments of inertia along each axis |
+| \( m \)        | Mass of the quadrotor                  |
+| \( g \)        | Gravitational acceleration             |
+
+### Translational Equations of Motion
+
+From the Newton-Euler equations (Equations 1, 2, and 3), you can calculate the accelerations along the x, y, and z axes using the thrust and orientation angles.
+
+$$a_x = \frac{T \cdot \sin(\theta)}{m}$$
+
+$$a_y = \frac{-mg \cdot \cos(\theta) \cdot \sin(\phi)}{m}$$
+
+$$a_z = \frac{T - mg \cdot \cos(\theta) \cdot \cos(\phi)}{m}$$
+
+### Rotational Equations of Motion
+
+The roll, pitch, and yaw torques, which are calculated from the rotor speeds, affect the drone’s angular acceleration. Using Equations 4, 5, and 6:
+
+$$\dot{p} = \frac{l \cdot k \cdot (\omega_4^2 - \omega_2^2)}{I_{x3}} - \frac{q \cdot r \cdot (I_{z3} - I_{y3})}{I_{x3}}$$
+   
+$$\dot{q} = \frac{l \cdot k \cdot (\omega_3^2 - \omega_1^2)}{I_{y3}} - \frac{r \cdot p \cdot (I_{x3} - I_{z3})}{I_{y3}}$$
+   
+$$\dot{r} = \frac{b \cdot (\omega_1^2 - \omega_2^2 + \omega_3^2 - \omega_4^2)}{I_{z3}} + \frac{p \cdot q \cdot (I_{y3} - I_{x3})}{I_{z3}}$$
+
+
+
+### Transformation from Inertial Frame to Body-Fixed Frame
+
+The angular velocities in the body-fixed frame (\( p \), \( q \), \( r \)) can be related to the rates of change of the Euler angles (\( $\dot{\phi}$ \), \( $\dot{\theta}$ \), \( $\dot{\psi} $\)) by the following transformation:
+
+$$
+\begin{bmatrix} p \\ q \\ r \end{bmatrix} =
+\begin{bmatrix}
+1 & 0 & -\sin(\theta) \\
+0 & \cos(\phi) & \cos(\theta) \sin(\phi) \\
+0 & -\sin(\phi) & \cos(\theta) \cos(\phi)
+\end{bmatrix}
+\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}
+$$
+
+---
+
+## Features
+
+- **Real-Time Drone Simulation**: Visualizes 3D drone dynamics with adjustable rotor speeds.
+- **Interactive User Controls**: Control rotor speeds, simulation speed, and emergency stop.
+- **Telemetry Display**: Real-time position, orientation, and velocity updates.
+- **Recording and Video Export**: Capture the entire Tkinter window (including controls) and export the simulation as a video.
+- **Customizable Parameters**: Easily adjust physical parameters like mass, arm length, and thrust coefficients.
+
+---
+
+## Prerequisites
+
+- Python 3.8+
+- Required Python Libraries:
+  - `numpy`
+  - `matplotlib`
+  - `tkinter` (included with Python)
+  - `Pillow`
+  - `moviepy`
+
+Access through [GitHub](https://github.com/adhikariprajitraj/3D-Drone-Navigation-Project/blob/main/optimization_rl/visualization/drone_dynamics_visualizer.py)
+
+---
+
+<!-- ---
 name: Actor Critic RL for Obstacle Avoidance and Trajectory Following in 3D for UAVs
 tools: [Python, Quadrotor Dynamics, In Progress]
 image: "/assets/images/nav3d.gif"
@@ -115,5 +213,4 @@ The reward function incentivizes the agent to reach the goal efficiently:
 
 ## Github
 https://github.com/username/3D-Drone-Navigation-Project.git
-
-
+ -->
