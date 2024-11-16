@@ -46,7 +46,7 @@ layout: default
       {% assign author_count = page.authors | size %}
       {% for author in page.authors %}
         <span style="display: inline;">
-          {{ author.name }}
+          {{ author.name }}                         <!-- Author Name -->
           {% if author.orcid %}
             <a href="https://orcid.org/{{ author.orcid }}" target="_blank" aria-label="ORCID Profile" class="author-icon">
               <i class="fab fa-orcid" style="color: #A6CE39;"></i>
@@ -56,6 +56,9 @@ layout: default
             <a href="mailto:{{ author.email }}" target="_blank" aria-label="Email" class="author-icon">
               <i class="fas fa-envelope" style="color: #2c3e50;"></i>
             </a>
+          {% endif %}
+          {% if author.doi %}
+            DOI: {{ author.doi }}
           {% endif %}
         </span>
         {% if forloop.last == false %}

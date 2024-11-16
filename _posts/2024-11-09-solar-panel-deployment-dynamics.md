@@ -5,6 +5,8 @@ authors:
   - name: Bishal Adhikari
     orcid: 0009-0001-1599-5499
     email: adhhikari.bishal@gmail.com
+    doi: 10.36227/techrxiv.173161301.19932306/v1
+    
 tags: [Preprint]
 read_more_type: external
 read_more_url:  https://doi.org/10.36227/techrxiv.173161301.19932306/v1
