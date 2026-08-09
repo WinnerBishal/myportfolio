@@ -9,60 +9,94 @@ function toArticleSlug(rawSlug: string) {
   return match ? match[1] : rawSlug;
 }
 
-function deriveDate(rawSlug: string) {
+function dateFromSlug(rawSlug: string) {
   const match = rawSlug.match(/^(\d{4})-(\d{2})-(\d{2})-/);
-  if (!match) {
-    return null;
-  }
-  const [_, year, month, day] = match;
-  return new Date(`${year}-${month}-${day}T00:00:00Z`);
+  return match ? new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00Z`) : null;
 }
 
-const sortedPosts = [...posts].sort((a, b) => (b.slug ?? b.id).localeCompare(a.slug ?? a.id));
+/** First couple of sentences of a long abstract, for the listing. */
+function trim(text: string, limit = 240) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= limit) return clean;
+  const cut = clean.slice(0, limit);
+  const stop = cut.lastIndexOf(". ");
+  return (stop > limit * 0.5 ? cut.slice(0, stop + 1) : cut.trimEnd() + "…");
+}
 
-const articleCards = sortedPosts.map((post) => {
-  const rawSlug = post.slug ?? post.id;
-  const slug = toArticleSlug(rawSlug);
-  const title = post.data.title ?? post.data.article_title ?? slug;
-  const date = deriveDate(rawSlug);
-  const dateLabel = date
-    ? new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(date)
-    : "Date unavailable";
+const entries = posts
+  .map((post) => {
+    const date = dateFromSlug(post.id);
+    // Label the outbound link for what it actually is, and drop placeholder
+    // URLs — one post still carries `paper_url: https://example.com`.
+    const url = post.data.paper_url ?? post.data.read_more_url;
+    const tags = (post.data.tags ?? []).map((tag) => tag.toLowerCase());
+    const usable = url && !/example\.com/i.test(url) ? url : undefined;
+    const paper = usable
+      ? {
+          url: usable,
+          label:
+            post.data.read_more_type === "paper"
+              ? "Published version"
+              : tags.includes("preprint")
+                ? "Read the preprint"
+                : "Read more"
+        }
+      : undefined;
 
-  return {
-    slug,
-    title,
-    dateLabel
-  };
-});
+    return {
+      href: `/articles/${toArticleSlug(post.id)}`,
+      title: post.data.title ?? post.data.article_title ?? post.id,
+      date,
+      dateLabel: date
+        ? new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(date)
+        : "",
+      summary: post.data.description ?? (post.data.abstract ? trim(post.data.abstract) : undefined),
+      tags: post.data.tags ?? [],
+      authors: (post.data.authors ?? []).map((a) => a.name),
+      paper
+    };
+  })
+  .sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
 ---
 
 <BaseLayout
   title="Research | Bishal Adhikari"
-  description="Articles route placeholder for migration with URL parity."
+  description="Papers and preprints on robotics, computer vision, and precision agriculture."
 >
-  <section class="hero">
-    <h1>Research</h1>
-    <p>
-      Research posts indexed from migrated content and published through stable article slugs.
-    </p>
-  </section>
+  <section class="feed" aria-labelledby="research-heading">
+    <div class="feed__head">
+      <h1 class="feed__title" id="research-heading">Research</h1>
+      <span class="feed__all">{entries.length} {entries.length === 1 ? "paper" : "papers"}</span>
+    </div>
 
-  <section class="ledger-list" aria-label="Articles list">
-    {
-      articleCards.map((article) => {
-        return (
-          <article class="ledger-row">
-            <p class="ledger-row__date">{article.dateLabel}</p>
-            <div>
-              <h2 class="ledger-row__title">{article.title}</h2>
-            </div>
-            <p class="ledger-row__action">
-              <a href={`/articles/${article.slug}`}>Read</a>
+    <ul class="feed__list">
+      {
+        entries.map((entry) => (
+          <li class="feed-entry">
+            <p class="feed-entry__meta">
+              <time class="feed-entry__date">{entry.dateLabel}</time>
             </p>
-          </article>
-        );
-      })
-    }
+
+            <h2 class="feed-entry__title">
+              <a href={entry.href}>{entry.title}</a>
+            </h2>
+
+            {entry.authors.length > 0 && <p class="research-entry__authors">{entry.authors.join(" · ")}</p>}
+            {entry.summary && <p class="feed-entry__summary">{entry.summary}</p>}
+
+            <p class="research-entry__foot">
+              {entry.tags.slice(0, 5).map((tag) => (
+                <span class="research-entry__tag">{tag}</span>
+              ))}
+              {entry.paper && (
+                <a class="research-entry__paper" href={entry.paper.url} target="_blank" rel="noopener noreferrer">
+                  {entry.paper.label}
+                </a>
+              )}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </BaseLayout>
