@@ -386,6 +386,13 @@ a:focus-visible {
   display: block;
   overflow: hidden;
   border-radius: 50%;
+  /*
+   * iOS Safari can fail to clip a descendant to a rounded box when that
+   * descendant has its own filter or animation — both are true here (the
+   * portrait carries a drop-shadow, the trace animates), so the photo spilled
+   * outside the circle on phones. clip-path is honoured in that case.
+   */
+  clip-path: circle(50% at 50% 50%);
   background: radial-gradient(
     120% 100% at 50% 18%,
     color-mix(in srgb, var(--aura) 14%, var(--surface)) 0%,
