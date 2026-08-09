@@ -1,0 +1,171 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DeltaRobot from "../components/DeltaRobot.astro";
+import {
+  PORTRAIT_GLASSES,
+  PORTRAIT_GLASSES_LENGTH,
+  PORTRAIT_HEIGHT,
+  PORTRAIT_WIDTH
+} from "../lib/portraitOutline";
+
+// Ring radius in its own 100x100 viewBox, and the circumference the dash maths needs.
+const RING_R = 48.5;
+const RING_LENGTH = 2 * Math.PI * RING_R;
+import "../styles/delta.css";
+
+type FeedEntry = {
+  title: string;
+  date: Date | null;
+  kind: string;
+  summary?: string;
+  href?: string;
+  external: boolean;
+};
+
+function articleSlug(rawSlug: string) {
+  const match = rawSlug.match(/^\d{4}-\d{2}-\d{2}-(.+)$/);
+  return match ? match[1] : rawSlug;
+}
+
+function dateFromSlug(rawSlug: string) {
+  const match = rawSlug.match(/^(\d{4})-(\d{2})-(\d{2})-/);
+  return match ? new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00Z`) : null;
+}
+
+const posts = await getCollection("posts");
+const notes = await getCollection("notes");
+
+const articleEntries: FeedEntry[] = posts.map((post) => ({
+  title: post.data.title ?? post.data.article_title ?? post.id,
+  date: dateFromSlug(post.id),
+  kind: "article",
+  summary: post.data.description,
+  href: `/articles/${articleSlug(post.id)}`,
+  external: false
+}));
+
+const noteEntries: FeedEntry[] = notes.map((note) => ({
+  title: note.data.title,
+  date: note.data.date,
+  kind: note.data.kind,
+  summary: note.data.summary,
+  href: note.data.url,
+  external: Boolean(note.data.url)
+}));
+
+const feed = [...articleEntries, ...noteEntries]
+  .sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0))
+  .slice(0, 6);
+
+const formatDate = (date: Date | null) =>
+  date
+    ? new Intl.DateTimeFormat("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        // Dates are UTC midnight; formatting locally would shift them a day back.
+        timeZone: "UTC"
+      }).format(date)
+    : "";
+---
+
+<BaseLayout
+  title="Bishal Adhikari"
+  description="Robotics and perception research for precision agriculture"
+>
+  <section class="intro">
+    <div class="intro__figure">
+      <DeltaRobot />
+    </div>
+
+    <div class="intro__identity">
+      {/* Hugs its widest child — the name — so the portrait centres over it. */}
+      <div class="intro__head">
+        <div class="portrait">
+          <span class="portrait__disc">
+            {/* Image and trace share one box, so the overlay stays registered. */}
+            <span class="portrait__plate">
+              <img
+                class="portrait__image"
+                src="/assets/images/portrait.png"
+                alt="Bishal Adhikari"
+                width={PORTRAIT_WIDTH}
+                height={PORTRAIT_HEIGHT}
+              />
+              <svg
+                class="portrait__trace"
+                viewBox={`0 0 ${PORTRAIT_WIDTH} ${PORTRAIT_HEIGHT}`}
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  class="portrait__trace-tail"
+                  d={PORTRAIT_GLASSES}
+                  style={`--len:${PORTRAIT_GLASSES_LENGTH}`}
+                />
+                <path
+                  class="portrait__trace-head"
+                  d={PORTRAIT_GLASSES}
+                  style={`--len:${PORTRAIT_GLASSES_LENGTH}`}
+                />
+              </svg>
+            </span>
+          </span>
+
+          {/*
+            The frame's ring, and the light that runs around it. `pathLength` is
+            normalised to 1000 so the dash lengths are percentages of the circle.
+          */}
+          <svg class="portrait__ring" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <circle class="portrait__ring-track" cx="50" cy="50" r={RING_R} />
+            <circle class="portrait__trace-tail" cx="50" cy="50" r={RING_R} style={`--len:${RING_LENGTH.toFixed(2)}`} />
+            <circle class="portrait__trace-head" cx="50" cy="50" r={RING_R} style={`--len:${RING_LENGTH.toFixed(2)}`} />
+          </svg>
+        </div>
+        <h1 class="intro__name">Bishal Adhikari</h1>
+      </div>
+      <p class="intro__line">
+        Serious man pretending to be cool.
+      </p>
+      <p class="intro__actions">
+        <a class="button-link" href="/projects">Projects</a>
+        <a class="button-link" href="/research">Research</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="feed" aria-labelledby="feed-heading">
+    <div class="feed__head">
+      <h2 class="feed__title" id="feed-heading">Writing &amp; notes</h2>
+      <a class="feed__all" href="/research">All research</a>
+    </div>
+
+    <ul class="feed__list">
+      {
+        feed.map((entry) => (
+          <li class="feed-entry">
+            <p class="feed-entry__meta">
+              <span class="feed-entry__kind" data-kind={entry.kind}>{entry.kind}</span>
+              <time class="feed-entry__date">{formatDate(entry.date)}</time>
+            </p>
+            <h3 class="feed-entry__title">
+              {entry.href ? (
+                <a
+                  href={entry.href}
+                  rel={entry.external ? "noopener noreferrer" : undefined}
+                  target={entry.external ? "_blank" : undefined}
+                >
+                  {entry.title}
+                </a>
+              ) : (
+                entry.title
+              )}
+            </h3>
+            {entry.summary && <p class="feed-entry__summary">{entry.summary}</p>}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

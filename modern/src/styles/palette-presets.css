@@ -1,0 +1,77 @@
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface-strong: #f1f3f5;
+  --text: #212529;
+  --muted: #6c757d;
+  --brand: #343a40;
+  --brand-ink: #212529;
+  --ring: #495057;
+  --border: #dee2e6;
+  --accent: #2c3e50; /* Deep Slate/Navy for an "expensive" look */
+}
+
+:root[data-theme="dark"] {
+  --bg: #1a1c1e;
+  --surface: #212529;
+  --surface-strong: #2c3035;
+  --text: #f8f9fa;
+  --muted: #adb5bd;
+  --brand: #ced4da;
+  --brand-ink: #f8f9fa;
+  --ring: #dee2e6;
+  --border: #343a40;
+  --accent: #5c7c8a; /* Muted Steel Blue for dark mode */
+}
+
+:root[data-palette="warm-ledger"] {
+  --bg: #fdfaf6;
+  --surface: #ffffff;
+  --surface-strong: #f7f3ed;
+  --text: #2d2a26;
+  --muted: #797167;
+  --brand: #4a453f;
+  --brand-ink: #2d2a26;
+  --ring: #797167;
+  --border: #e2dcd0;
+  --accent: #8b7355; /* Refined Gold/Bronze */
+}
+
+:root[data-palette="warm-ledger"][data-theme="dark"] {
+  --bg: #1c1b19;
+  --surface: #262421;
+  --surface-strong: #2d2b28;
+  --text: #fdfaf6;
+  --muted: #a89f94;
+  --brand: #e2dcd0;
+  --brand-ink: #fdfaf6;
+  --ring: #a89f94;
+  --border: #3d3a35;
+  --accent: #c5a47e;
+}
+
+:root[data-palette="modern-lab"] {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface-strong: #f1f3f5;
+  --text: #212529;
+  --muted: #6c757d;
+  --brand: #343a40;
+  --brand-ink: #212529;
+  --ring: #495057;
+  --border: #dee2e6;
+  --accent: #2c3e50;
+}
+
+:root[data-palette="modern-lab"][data-theme="dark"] {
+  --bg: #1a1c1e;
+  --surface: #212529;
+  --surface-strong: #2c3035;
+  --text: #f8f9fa;
+  --muted: #adb5bd;
+  --brand: #ced4da;
+  --brand-ink: #f8f9fa;
+  --ring: #dee2e6;
+  --border: #343a40;
+  --accent: #5c7c8a;
+}

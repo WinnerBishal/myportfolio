@@ -1,0 +1,15 @@
+export const PORTRAIT_WIDTH = 620;
+export const PORTRAIT_HEIGHT = 829;
+
+/**
+ * Outline of the sunglasses. The lenses and the hair are the same near-black
+ * and they touch, so neither thresholding nor colour could separate them; this
+ * is instead extracted by walking up and down from the lens centreline in each
+ * column until the frame gives way to skin, then median-filtered to drop the
+ * nose-shadow spike. It is a close approximation, not an exact contour.
+ */
+export const PORTRAIT_GLASSES =
+  "M 96 190.0 L 101 190.2 L 106 190.6 L 111 191.2 L 116 191.7 L 121 192.5 L 126 193.2 L 131 193.8 L 136 194.5 L 141 195.3 L 146 196.0 L 151 196.6 L 156 197.4 L 161 198.0 L 166 198.7 L 171 199.5 L 176 200.2 L 181 200.8 L 186 201.5 L 191 202.3 L 196 203.0 L 201 203.6 L 206 204.4 L 211 205.0 L 216 206.1 L 221 207.9 L 226 210.7 L 231 215.0 L 236 221.3 L 241 228.5 L 248 232.8 L 253 235.0 L 258 236.1 L 263 237.4 L 268 238.5 L 273 238.0 L 278 233.7 L 283 227.6 L 288 223.8 L 293 223.0 L 298 223.0 L 303 223.0 L 308 223.3 L 313 223.7 L 318 224.2 L 323 224.6 L 328 225.4 L 333 226.0 L 338 226.9 L 343 227.9 L 348 229.2 L 353 230.3 L 358 230.9 L 363 230.7 L 368 229.9 L 373 229.2 L 378 229.0 L 383 229.0 L 388 229.0 L 392 229.0 L 392 308.9 L 387 309.8 L 382 311.2 L 377 312.7 L 372 314.2 L 367 314.9 L 362 315.0 L 357 314.6 L 352 314.2 L 347 313.8 L 342 313.5 L 337 312.7 L 332 312.0 L 327 311.3 L 322 310.5 L 317 309.8 L 312 309.2 L 307 308.5 L 302 307.8 L 297 307.2 L 292 306.5 L 287 305.7 L 282 305.0 L 277 304.3 L 272 303.5 L 267 299.2 L 262 288.1 L 257 272.5 L 252 261.8 L 247 258.2 L 240 258.0 L 235 258.9 L 230 262.5 L 225 269.4 L 220 278.1 L 215 286.3 L 210 291.3 L 205 293.0 L 200 293.0 L 195 292.7 L 190 292.2 L 185 291.5 L 180 290.7 L 175 290.0 L 170 289.3 L 165 288.5 L 160 287.8 L 155 287.2 L 150 286.5 L 145 285.8 L 140 285.2 L 135 284.5 L 130 283.7 L 125 283.0 L 120 282.3 L 115 281.5 L 110 281.2 L 105 280.7 L 100 280.4 L 96 280.0 Z";
+
+/** Perimeter of the glasses path, so dash lengths can be exact fractions. */
+export const PORTRAIT_GLASSES_LENGTH = 828.5;

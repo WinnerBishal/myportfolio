@@ -1,0 +1,394 @@
+---
+import { buildFrame, buildStatics, itemPoint, HOME, PICK_SPOTS, PLACE_SPOTS } from "../lib/delta";
+import {
+  JOKE_LEFT,
+  STATUS_AXES_Y,
+  STATUS_RULE_Y,
+  STATUS_STATE_Y,
+  lineOffset,
+  randomJoke,
+  wrapJoke
+} from "../lib/jokes";
+
+// Resting pose, rendered at build time. The client script animates from here;
+// without JavaScript, with reduced motion, or on a narrow screen this frame is
+// what stays on the page — and it is a correct solution, not a placeholder.
+const statics = buildStatics();
+const frame = buildFrame(HOME, 0, false);
+
+// Depth decides what the fixed plate and the moving platform hide. The two arms
+// behind the plate are drawn first so it covers them; the arm facing the viewer
+// is drawn last so it stays in front of both the plate and the platform it
+// hangs from. Shoulders never move, so this split holds for every pose and the
+// DOM order stays stable for the animation.
+const armIndices = [0, 1, 2];
+const behind = armIndices.filter((i) => frame.arms[i].depth < 0);
+const inFront = armIndices.filter((i) => frame.arms[i].depth >= 0);
+
+const jokeLines = wrapJoke(randomJoke());
+---
+
+<figure class="delta">
+  <svg
+    id="delta"
+    class="delta__svg"
+    viewBox="-520 -250 990 1140"
+    role="img"
+    aria-label="Diagram of a delta robot transferring parts between two stations"
+  >
+    <defs>
+      {/* Clip lives inside the plate's local space, so it follows the hexagon. */}
+      <clipPath id="delta-plate-clip">
+        <path d={statics.consoleLocal} />
+      </clipPath>
+      <linearGradient id="delta-console-glare" x1="0" y1="0" x2="0.7" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.16" />
+        <stop offset="45%" stop-color="#ffffff" stop-opacity="0.03" />
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+      </linearGradient>
+      <linearGradient id="delta-console-sweep" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--console-ink)" stop-opacity="0" />
+        <stop offset="50%" stop-color="var(--console-ink)" stop-opacity="0.16" />
+        <stop offset="100%" stop-color="var(--console-ink)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    <g class="delta-stage">
+      <path class="delta-surface" d={statics.surface} />
+      {PLACE_SPOTS.map((spot) => {
+        const p = itemPoint(spot);
+        return <circle class="delta-target" cx={p.x} cy={p.y} r="17" />;
+      })}
+      {PICK_SPOTS.map((spot, i) => {
+        const p = itemPoint(spot);
+        return <circle class="delta-item" id={`delta-item-${i}`} cx={p.x} cy={p.y} r="15" />;
+      })}
+    </g>
+
+    <g class="delta-arms delta-arms--behind">
+      {behind.map((i) => (
+        <g class="delta-arm">
+          <path class="delta-rod" id={`delta-rod-a-${i}`} d={frame.arms[i].rodA} />
+          <path class="delta-rod" id={`delta-rod-b-${i}`} d={frame.arms[i].rodB} />
+          <path class="delta-bicep-outer" id={`delta-bicep-o-${i}`} d={frame.arms[i].bicep} />
+          <path class="delta-bicep-inner" id={`delta-bicep-i-${i}`} d={frame.arms[i].bicep} />
+          <circle class="delta-joint" id={`delta-elbow-${i}`} cx={frame.arms[i].elbow.x} cy={frame.arms[i].elbow.y} r="9" />
+          <circle class="delta-joint" id={`delta-wrist-${i}`} cx={frame.arms[i].wrist.x} cy={frame.arms[i].wrist.y} r="7" />
+        </g>
+      ))}
+    </g>
+
+    <g class="delta-frame">
+      {statics.sides.map((side) => (
+        <path class="delta-plate-side" d={side} />
+      ))}
+      {/* Opaque, so nothing passing beneath the plate shows through it. */}
+      <path class="delta-plate" d={statics.plateTop} />
+      {statics.axles.map((axle) => (
+        <g class="delta-axle-group">
+          <path class="delta-axle" d={axle.shaft} />
+          <circle class="delta-axle-cap" cx={axle.capA.x} cy={axle.capA.y} r="10" />
+          <circle class="delta-axle-cap" cx={axle.capB.x} cy={axle.capB.y} r="10" />
+        </g>
+      ))}
+      {/*
+        The console is drawn into the plate's own plane: the matrix is the
+        projection of the z = 0 plane, and the inner rotation lays the text
+        along the plate edge that carries the front actuator, so the lines run
+        parallel to that edge instead of cutting across the hexagon.
+      */}
+      <g class="delta-console" transform="matrix(0.8660254 0.5 -0.8660254 0.5 0 0)">
+        <g clip-path="url(#delta-plate-clip)">
+          <path class="delta-console-face" d={statics.consoleLocal} />
+          <g transform="rotate(-60)">
+            <rect class="delta-console-grid" x="-400" y="-400" width="800" height="800" />
+            <rect class="delta-console-sweep" x="-300" y="-40" width="600" height="80" />
+            <text id="delta-console-text" class="delta-console-text" x={JOKE_LEFT} y="0">
+              {jokeLines.map((line, i) => <tspan x={JOKE_LEFT} dy={lineOffset(i)}>{line}</tspan>)}
+            </text>
+
+            {/* Live readout of the machine the console is bolted to. */}
+            <path class="delta-console-rule" d={`M -142 ${STATUS_RULE_Y} L 142 ${STATUS_RULE_Y}`} />
+            <text id="delta-console-state" class="delta-console-status" x="0" y={STATUS_STATE_Y}>
+              &gt; STANDBY
+            </text>
+            <text id="delta-console-axes" class="delta-console-status" x="0" y={STATUS_AXES_Y}>
+              {frame.arms.map((arm, i) => `A${i + 1} ${Math.round(arm.theta).toString().padStart(3, "0")}  `).join("")}
+            </text>
+          </g>
+        </g>
+        <path class="delta-console-glare" d={statics.consoleLocal} />
+
+        {/* Brackets fixing the screen to the frame, on the armless edges. */}
+        {statics.bezels.map((bezel) => (
+          <g class="delta-bezel">
+            <path class="delta-bezel-plate" d={bezel.plate} />
+            <circle class="delta-bezel-bolt" cx={bezel.bolt.x} cy={bezel.bolt.y} r="5" />
+          </g>
+        ))}
+      </g>
+
+
+      {armIndices.map((i) => (
+        <circle class="delta-joint" id={`delta-shoulder-${i}`} cx={frame.arms[i].shoulder.x} cy={frame.arms[i].shoulder.y} r="11" />
+      ))}
+    </g>
+
+    <g class="delta-effector">
+      <path class="delta-platform-edge" id="delta-platform-edge" d={frame.platformEdge} />
+      <path class="delta-platform" id="delta-platform" d={frame.platform} />
+      <path class="delta-gripper" id="delta-grip-l" d={frame.gripperLeft} />
+      <path class="delta-gripper" id="delta-grip-r" d={frame.gripperRight} />
+    </g>
+
+    <g class="delta-arms delta-arms--front">
+      {inFront.map((i) => (
+        <g class="delta-arm">
+          <path class="delta-rod" id={`delta-rod-a-${i}`} d={frame.arms[i].rodA} />
+          <path class="delta-rod" id={`delta-rod-b-${i}`} d={frame.arms[i].rodB} />
+          <path class="delta-bicep-outer" id={`delta-bicep-o-${i}`} d={frame.arms[i].bicep} />
+          <path class="delta-bicep-inner" id={`delta-bicep-i-${i}`} d={frame.arms[i].bicep} />
+          <circle class="delta-joint" id={`delta-elbow-${i}`} cx={frame.arms[i].elbow.x} cy={frame.arms[i].elbow.y} r="9" />
+          <circle class="delta-joint" id={`delta-wrist-${i}`} cx={frame.arms[i].wrist.x} cy={frame.arms[i].wrist.y} r="7" />
+        </g>
+      ))}
+    </g>
+  </svg>
+</figure>
+
+<script>
+  import {
+    buildFrame,
+    itemPoint,
+    HOME,
+    PICK_SPOTS,
+    PLACE_SPOTS,
+    TRAVEL_Z,
+    WORK_Z,
+    type Vec3
+  } from "../lib/delta";
+  import {
+    JOKE_LEFT,
+    consoleDuration,
+    consoleFrameAt,
+    consoleProgram,
+    lineOffset,
+    randomJoke,
+    wrapJoke,
+    type ConsoleFrame
+  } from "../lib/jokes";
+
+  const svg = document.getElementById("delta");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (svg && !reduceMotion) {
+    const pick = <T extends Element>(id: string) => svg.querySelector(id) as T;
+    const arms = [0, 1, 2].map((i) => ({
+      rodA: pick<SVGPathElement>(`#delta-rod-a-${i}`),
+      rodB: pick<SVGPathElement>(`#delta-rod-b-${i}`),
+      bicepOuter: pick<SVGPathElement>(`#delta-bicep-o-${i}`),
+      bicepInner: pick<SVGPathElement>(`#delta-bicep-i-${i}`),
+      elbow: pick<SVGCircleElement>(`#delta-elbow-${i}`),
+      wrist: pick<SVGCircleElement>(`#delta-wrist-${i}`)
+    }));
+    const platform = pick<SVGPathElement>("#delta-platform");
+    const platformEdge = pick<SVGPathElement>("#delta-platform-edge");
+    const gripLeft = pick<SVGPathElement>("#delta-grip-l");
+    const gripRight = pick<SVGPathElement>("#delta-grip-r");
+    const items = [0, 1, 2].map((i) => pick<SVGCircleElement>(`#delta-item-${i}`));
+    const consoleText = pick<SVGTextElement>("#delta-console-text");
+    const consoleState = pick<SVGTextElement>("#delta-console-state");
+    const consoleAxes = pick<SVGTextElement>("#delta-console-axes");
+
+    // What the machine is doing, keyed to the eight phases of one transfer.
+    const PHASE_LABELS = [
+      "APPROACH",
+      "DESCEND",
+      "GRIP",
+      "LIFT",
+      "TRANSFER",
+      "ALIGN",
+      "RELEASE",
+      "RETRACT"
+    ];
+
+    // The plate console runs its own boot-then-joke program, rerolling the joke
+    // each time it loops, independent of the arm's pick cycle.
+    let program = consoleProgram(wrapJoke(randomJoke()));
+    let programLength = consoleDuration(program);
+    let programStart = 0;
+    let painted = "";
+
+    function paintConsole(consoleFrame: ConsoleFrame) {
+      const key = consoleFrame.lines.join("\n");
+      if (key === painted) return;
+      painted = key;
+
+      const lines = consoleFrame.lines.length > 0 ? consoleFrame.lines : [""];
+      consoleText.textContent = "";
+      lines.forEach((line, i) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        tspan.setAttribute("x", String(JOKE_LEFT));
+        tspan.setAttribute("dy", String(lineOffset(i)));
+        tspan.textContent = line;
+
+        if (i === lines.length - 1) {
+          const cursor = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+          cursor.setAttribute("class", "delta-console-cursor");
+          cursor.textContent = "█";
+          tspan.appendChild(cursor);
+        }
+        consoleText.appendChild(tspan);
+      });
+    }
+
+    function renderConsole(elapsed: number) {
+      if (elapsed - programStart >= programLength) {
+        programStart = elapsed;
+        program = consoleProgram(wrapJoke(randomJoke()));
+        programLength = consoleDuration(program);
+      }
+      paintConsole(consoleFrameAt(program, elapsed - programStart));
+    }
+
+    type Phase = { duration: number; to: Vec3; grip: number; carrying: number };
+
+    const above = (spot: Vec3): Vec3 => ({ x: spot.x, y: spot.y, z: TRAVEL_Z });
+    const at = (spot: Vec3): Vec3 => ({ x: spot.x, y: spot.y, z: WORK_Z });
+
+    // One transfer per part: approach, descend, close, lift, traverse,
+    // descend, release, lift. Then the platform returns home and the cycle
+    // repeats with the parts back where they started.
+    const phases: Phase[] = [];
+    for (let i = 0; i < PICK_SPOTS.length; i += 1) {
+      phases.push(
+        { duration: 0.95, to: above(PICK_SPOTS[i]), grip: 0, carrying: -1 },
+        { duration: 0.45, to: at(PICK_SPOTS[i]), grip: 0, carrying: -1 },
+        { duration: 0.35, to: at(PICK_SPOTS[i]), grip: 1, carrying: -1 },
+        { duration: 0.45, to: above(PICK_SPOTS[i]), grip: 1, carrying: i },
+        { duration: 1.0, to: above(PLACE_SPOTS[i]), grip: 1, carrying: i },
+        { duration: 0.45, to: at(PLACE_SPOTS[i]), grip: 1, carrying: i },
+        { duration: 0.35, to: at(PLACE_SPOTS[i]), grip: 0, carrying: i },
+        { duration: 0.45, to: above(PLACE_SPOTS[i]), grip: 0, carrying: -1 }
+      );
+    }
+    phases.push({ duration: 0.9, to: HOME, grip: 0, carrying: -1 });
+
+    const cycle = phases.reduce((sum, phase) => sum + phase.duration, 0);
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    function poseAt(elapsed: number) {
+      let time = elapsed % cycle;
+      let from = HOME;
+      let grip = 0;
+
+      for (let index = 0; index < phases.length; index += 1) {
+        const phase = phases[index];
+        if (time < phase.duration) {
+          const t = smooth(time / phase.duration);
+          return {
+            target: {
+              x: lerp(from.x, phase.to.x, t),
+              y: lerp(from.y, phase.to.y, t),
+              z: lerp(from.z, phase.to.z, t)
+            },
+            grip: lerp(grip, phase.grip, t),
+            carrying: phase.carrying,
+            phase: index
+          };
+        }
+        time -= phase.duration;
+        from = phase.to;
+        grip = phase.grip;
+      }
+
+      return { target: HOME, grip: 0, carrying: -1, phase: phases.length };
+    }
+
+    function render(elapsed: number) {
+      renderConsole(elapsed);
+      const pose = poseAt(elapsed);
+      const frame = buildFrame(pose.target, pose.grip, pose.carrying >= 0);
+
+      arms.forEach((arm, i) => {
+        arm.rodA.setAttribute("d", frame.arms[i].rodA);
+        arm.rodB.setAttribute("d", frame.arms[i].rodB);
+        arm.bicepOuter.setAttribute("d", frame.arms[i].bicep);
+        arm.bicepInner.setAttribute("d", frame.arms[i].bicep);
+        arm.elbow.setAttribute("cx", String(frame.arms[i].elbow.x));
+        arm.elbow.setAttribute("cy", String(frame.arms[i].elbow.y));
+        arm.wrist.setAttribute("cx", String(frame.arms[i].wrist.x));
+        arm.wrist.setAttribute("cy", String(frame.arms[i].wrist.y));
+      });
+
+      const part = Math.min(Math.floor(pose.phase / 8) + 1, PICK_SPOTS.length);
+      const label = pose.phase >= PHASE_LABELS.length * PICK_SPOTS.length
+        ? "HOMING"
+        : `${PHASE_LABELS[pose.phase % 8]} ${part}/${PICK_SPOTS.length}`;
+      consoleState.textContent = `> ${label}`;
+      consoleAxes.textContent = frame.arms
+        .map((arm, i) => `A${i + 1} ${Math.round(arm.theta).toString().padStart(3, "0")}`)
+        .join("  ");
+
+      platform.setAttribute("d", frame.platform);
+      platformEdge.setAttribute("d", frame.platformEdge);
+      gripLeft.setAttribute("d", frame.gripperLeft);
+      gripRight.setAttribute("d", frame.gripperRight);
+
+      // Each part sits at its pick spot until its own release phase has run;
+      // the eight phases of a transfer belong to part `index / 8`.
+      const transferred = Math.floor((pose.phase + 1) / 8);
+      items.forEach((item, i) => {
+        let point;
+        if (pose.carrying === i) {
+          point = frame.payload;
+        } else if (i < transferred) {
+          point = itemPoint(PLACE_SPOTS[i]);
+        } else {
+          point = itemPoint(PICK_SPOTS[i]);
+        }
+        item.setAttribute("cx", String(point.x));
+        item.setAttribute("cy", String(point.y));
+      });
+    }
+
+    let running = false;
+    let raf = 0;
+    let origin = 0;
+    // Total animated time, held across pauses so the cycle resumes in place.
+    let elapsed = 0;
+    let resumeFrom = 0;
+
+    const tick = (now: number) => {
+      if (!origin) origin = now;
+      elapsed = resumeFrom + (now - origin) / 1000;
+      render(elapsed);
+      raf = requestAnimationFrame(tick);
+    };
+
+    function start() {
+      if (running) return;
+      running = true;
+      origin = 0;
+      resumeFrom = elapsed;
+      raf = requestAnimationFrame(tick);
+    }
+
+    function stop() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(raf);
+    }
+
+    // Runs straight away; the observer only parks it while off screen.
+    start();
+    new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        start();
+      } else {
+        stop();
+      }
+    }).observe(svg);
+  }
+</script>

@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Ported from the legacy Jekyll page of the same URL. The calculator itself is
+// a Streamlit app hosted elsewhere; this page is its front door.
+const APP_URL = "https://delta-robot.streamlit.app";
+---
+
+<BaseLayout
+  title="Delta Robot Kinematics Calculator | Bishal Adhikari"
+  description="Plan delta robot dimensions, visualise end-effector motion from joint parameters, and inspect joint trajectories for a spline path."
+>
+  <header class="project-masthead">
+    <a class="project-masthead__back" href="/projects">Projects</a>
+    <h1 class="project-masthead__title">Delta Robot Kinematics Calculator</h1>
+    <p class="project-masthead__standfirst">
+      Plan the dimensions of your robot, visualise the movement of a delta robot's end effector from its joint
+      parameters, and inspect the joint trajectory a motor follows for a given spline path.
+    </p>
+  </header>
+
+  <section class="tool-launch">
+    <p class="tool-launch__note">The calculator runs as a hosted app and opens in a new tab.</p>
+    <a class="button-link tool-launch__button" href={APP_URL} target="_blank" rel="noopener noreferrer">
+      Open the calculator
+    </a>
+    <p class="tool-launch__host">{APP_URL.replace("https://", "")}</p>
+  </section>
+</BaseLayout>

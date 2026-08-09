@@ -1,0 +1,114 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post) => {
+    const rawSlug = post.slug ?? post.id;
+    const slugMatch = rawSlug.match(/^\d{4}-\d{2}-\d{2}-(.+)$/);
+    const dateMatch = rawSlug.match(/^(\d{4})-(\d{2})-(\d{2})-/);
+    const publishedAt = dateMatch
+      ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T00:00:00Z`)
+      : null;
+
+    return {
+      params: { slug: slugMatch ? slugMatch[1] : rawSlug },
+      props: { post, publishedAt }
+    };
+  });
+}
+
+const { post, publishedAt } = Astro.props;
+const { Content } = await render(post);
+const title = post.data.title ?? post.data.article_title ?? post.slug ?? post.id;
+const description = post.data.description ?? post.data.abstract ?? "Article";
+const formattedDate = publishedAt
+  ? new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(publishedAt)
+  : null;
+const authors = post.data.authors ?? [];
+const hasBody = typeof post.body === "string" && post.body.trim().length > 0;
+---
+
+<BaseLayout title={`${title} | Bishal Adhikari`} description={description}>
+  <section class="page-lead">
+    <h1>{title}</h1>
+    {formattedDate && <p class="muted-text">{formattedDate}</p>}
+    {post.data.tags && post.data.tags.length > 0 && (
+      <p>
+        {post.data.tags.map((tag) => (
+          <span class="chip">{tag}</span>
+        ))}
+      </p>
+    )}
+  </section>
+
+  <section class="article-meta-shell">
+    {post.data.abstract && (
+      <div class="article-meta-block article-meta-block--abstract">
+        <h2>Abstract</h2>
+        <p>{post.data.abstract}</p>
+      </div>
+    )}
+
+    <div class="article-meta-block">
+      <h2>Authors</h2>
+      {authors.length > 0 ? (
+        <ul class="author-list">
+          {authors.map((author) => (
+            <li class="author-list__item">
+              <p class="author-name-row">
+                <span class="author-name">{author.name}</span>
+                {author.orcid ? (
+                  <a
+                    class="orcid-badge"
+                    href={`https://orcid.org/${author.orcid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ORCID profile for ${author.name}`}
+                    title={`ORCID: ${author.orcid}`}
+                  >
+                    <span class="orcid-badge__icon" aria-hidden="true">iD</span>
+                    <span class="orcid-badge__text">ORCID</span>
+                  </a>
+                ) : (
+                  <span class="orcid-badge orcid-badge--inactive">
+                    <span class="orcid-badge__icon" aria-hidden="true">iD</span>
+                    <span class="orcid-badge__text">ORCID</span>
+                  </span>
+                )}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted-text">No author metadata is available for this article.</p>
+      )}
+    </div>
+
+    <div class="article-meta-actions">
+      {post.data.read_more_type === "external" && post.data.read_more_url ? (
+        <a
+          class="button-link"
+          href={post.data.read_more_url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read Full Article
+        </a>
+      ) : post.data.paper_url ? (
+        <a class="button-link" href={post.data.paper_url} target="_blank" rel="noopener noreferrer">
+          Open Paper
+        </a>
+      ) : (
+        <a class="button-link" href="/request.html">Request Full Article</a>
+      )}
+    </div>
+  </section>
+
+  {hasBody && (
+  <article class="content-shell">
+    <Content />
+  </article>
+  )}
+</BaseLayout>

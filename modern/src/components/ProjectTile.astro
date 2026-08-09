@@ -1,0 +1,81 @@
+---
+export type ProjectTileData = {
+  index: number;
+  name: string;
+  tools: string[];
+  image?: string;
+  motion?: string;
+  href: string;
+  aspect: number;
+};
+
+const { tile } = Astro.props as { tile: ProjectTileData };
+---
+
+<a
+  class="tile"
+  href={tile.href}
+  style={`--aspect:${tile.aspect.toFixed(4)}; --grow:${tile.aspect.toFixed(4)};`}
+  aria-label={`Open project notes for ${tile.name}`}
+>
+  <span class="tile__figure">
+    {tile.motion ? (
+      /*
+       * A silent looping clip rather than an animated GIF: same effect at a
+       * fraction of the bytes. Nothing is fetched until the tile is on screen —
+       * see the observer below — and the poster covers it until then.
+       */
+      <video
+        class="tile__motion"
+        poster={tile.image}
+        data-src={tile.motion}
+        preload="none"
+        muted
+        loop
+        playsinline
+        aria-hidden="true"
+      />
+    ) : tile.image ? (
+      <img src={tile.image} alt="" loading="lazy" decoding="async" />
+    ) : (
+      <span class="tile__blank">No figure attached</span>
+    )}
+  </span>
+
+  <span class="tile__overlay">
+    <span class="tile__index">{String(tile.index + 1).padStart(2, "0")}</span>
+    <span class="tile__name">{tile.name}</span>
+    <span class="tile__detail">
+      {tile.tools.length > 0 && (
+        <span class="tile__tools">
+          {tile.tools.map((tool) => (
+            <span class="tile__tool">{tool}</span>
+          ))}
+        </span>
+      )}
+    </span>
+  </span>
+</a>
+
+<script>
+  // Load and play a tile's clip only while it is on screen, and never when the
+  // visitor has asked for reduced motion.
+  const clips = document.querySelectorAll<HTMLVideoElement>(".tile__motion");
+  if (clips.length > 0 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            if (!video.src && video.dataset.src) video.src = video.dataset.src;
+            void video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    clips.forEach((clip) => observer.observe(clip));
+  }
+</script>

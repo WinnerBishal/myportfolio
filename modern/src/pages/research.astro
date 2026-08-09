@@ -1,0 +1,68 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = await getCollection("posts");
+
+function toArticleSlug(rawSlug: string) {
+  const match = rawSlug.match(/^\d{4}-\d{2}-\d{2}-(.+)$/);
+  return match ? match[1] : rawSlug;
+}
+
+function deriveDate(rawSlug: string) {
+  const match = rawSlug.match(/^(\d{4})-(\d{2})-(\d{2})-/);
+  if (!match) {
+    return null;
+  }
+  const [_, year, month, day] = match;
+  return new Date(`${year}-${month}-${day}T00:00:00Z`);
+}
+
+const sortedPosts = [...posts].sort((a, b) => (b.slug ?? b.id).localeCompare(a.slug ?? a.id));
+
+const articleCards = sortedPosts.map((post) => {
+  const rawSlug = post.slug ?? post.id;
+  const slug = toArticleSlug(rawSlug);
+  const title = post.data.title ?? post.data.article_title ?? slug;
+  const date = deriveDate(rawSlug);
+  const dateLabel = date
+    ? new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(date)
+    : "Date unavailable";
+
+  return {
+    slug,
+    title,
+    dateLabel
+  };
+});
+---
+
+<BaseLayout
+  title="Research | Bishal Adhikari"
+  description="Articles route placeholder for migration with URL parity."
+>
+  <section class="hero">
+    <h1>Research</h1>
+    <p>
+      Research posts indexed from migrated content and published through stable article slugs.
+    </p>
+  </section>
+
+  <section class="ledger-list" aria-label="Articles list">
+    {
+      articleCards.map((article) => {
+        return (
+          <article class="ledger-row">
+            <p class="ledger-row__date">{article.dateLabel}</p>
+            <div>
+              <h2 class="ledger-row__title">{article.title}</h2>
+            </div>
+            <p class="ledger-row__action">
+              <a href={`/articles/${article.slug}`}>Read</a>
+            </p>
+          </article>
+        );
+      })
+    }
+  </section>
+</BaseLayout>

@@ -1,0 +1,90 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectTile from "../../components/ProjectTile.astro";
+import type { ProjectTileData } from "../../components/ProjectTile.astro";
+import { getImageSize } from "../../lib/imageSize";
+import { justifyRows } from "../../lib/justifyRows";
+
+const FALLBACK_ASPECT = 1.5;
+
+// Explicit `order` drives the grid so filenames can be readable slugs; entries
+// without one fall to the end in id order.
+const projects = (await getCollection("projects")).sort((a, b) => {
+  const ao = a.data.order ?? Number.MAX_SAFE_INTEGER;
+  const bo = b.data.order ?? Number.MAX_SAFE_INTEGER;
+  return ao === bo ? a.id.localeCompare(b.id) : ao - bo;
+});
+
+function toProjectUrl(slug: string, permalink?: string) {
+  if (permalink && permalink.trim().length > 0) {
+    return permalink;
+  }
+  return `/projects/${slug}`;
+}
+
+const tiles: ProjectTileData[] = projects.map((project, index) => {
+  const slug = project.id;
+  const size = project.data.image ? getImageSize(project.data.image) : null;
+
+  return {
+    index,
+    name: project.data.name ?? slug,
+    tools: project.data.tools ?? [],
+    image: project.data.image,
+    motion: project.data.motion,
+    href: toProjectUrl(slug, project.data.permalink),
+    aspect: size ? size.width / size.height : FALLBACK_ASPECT
+  };
+});
+
+const aspectOf = (tile: ProjectTileData) => tile.aspect;
+
+// The packing depends on how wide the container is, and CSS cannot re-pack, so
+// both groupings are emitted and the media query picks one. The hidden set is
+// `display: none`, which keeps it out of the accessibility tree and stops the
+// browser fetching its lazy images.
+const wideRows = justifyRows(tiles, aspectOf, {
+  containerWidth: 1120,
+  targetHeight: 260,
+  gap: 8,
+  maxPerRow: 4
+});
+
+const narrowRows = justifyRows(tiles, aspectOf, {
+  containerWidth: 380,
+  targetHeight: 230,
+  gap: 8,
+  maxPerRow: 2,
+  fillerThreshold: 0.2
+});
+---
+
+<BaseLayout
+  title="Projects | Bishal Adhikari"
+  description="Published project portfolio with preserved legacy URL behavior."
+>
+  <h1 class="visually-hidden">Projects</h1>
+
+  <section class="tile-grid" aria-label="Projects folio grid">
+    {
+      [
+        { rows: wideRows, modifier: "wide" },
+        { rows: narrowRows, modifier: "narrow" }
+      ].map((set) => (
+        <div class={`tile-set tile-set--${set.modifier}`}>
+          {set.rows.map((row) => (
+            <div class="tile-row">
+              {row.items.map((tile) => (
+                <ProjectTile tile={tile} />
+              ))}
+              {row.filler > 0 && (
+                <span class="tile-filler" style={`--grow:${row.filler.toFixed(4)};`} aria-hidden="true" />
+              )}
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </section>
+</BaseLayout>

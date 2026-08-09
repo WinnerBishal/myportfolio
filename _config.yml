@@ -61,5 +61,7 @@ exclude:
 - LICENSE
 - Gemfile
 - Gemfile.lock
+- modern/
+- node_modules/
 
 include: ['_pages']

@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ReportPanel from "../components/ReportPanel.astro";
+import ProjectMasthead from "../components/ProjectMasthead.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+
+  return projects
+    .filter((project) => project.data.permalink && !project.data.permalink.startsWith("/projects/"))
+    .map((project) => ({
+      params: { legacyProject: (project.data.permalink as string).replace(/^\/+|\/+$/g, "") },
+      props: { project }
+    }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const name = project.data.name ?? project.id;
+---
+
+<BaseLayout title={`${name} | Bishal Adhikari`} description={project.data.description ?? "Project details"}>
+  <ProjectMasthead name={name} description={project.data.description} tools={project.data.tools} />
+
+  {project.data.image && !project.data.report && (
+    <img class="project-cover" src={project.data.image} alt={name} />
+  )}
+
+  {project.data.report && <ReportPanel {...project.data.report} name={name} />}
+
+  <article class="content-shell">
+    <Content />
+  </article>
+</BaseLayout>

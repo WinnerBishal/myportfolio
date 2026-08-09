@@ -1,0 +1,234 @@
+/*
+ * Delta robot figure. Line-art with solid fills so the mechanism reads as a
+ * machine rather than a wireframe: members are drawn as outlined bars, joints
+ * as capped pivots, and the fixed structure carries shaded faces.
+ */
+
+.delta {
+  --delta-ink: #303840;
+  --delta-fill: var(--surface);
+  --delta-shade: color-mix(in srgb, var(--border) 45%, var(--surface));
+  --delta-deep: color-mix(in srgb, var(--border) 78%, var(--surface));
+  --delta-line: 2.4;
+  /* The screen reads dark in both themes; it is a display, not paper. */
+  --console-bg: #121a24;
+  --console-ink: #7fe3c0;
+
+  margin: 0;
+  width: 100%;
+}
+
+:root[data-theme="dark"] .delta {
+  --delta-ink: #c3cbd3;
+  --delta-fill: color-mix(in srgb, var(--surface-strong) 82%, var(--bg));
+  --delta-shade: color-mix(in srgb, var(--surface-strong) 60%, var(--bg));
+  --delta-deep: color-mix(in srgb, var(--bg) 72%, var(--surface-strong));
+}
+
+.delta__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Stage */
+.delta-surface {
+  fill: color-mix(in srgb, var(--delta-shade) 40%, transparent);
+  stroke: color-mix(in srgb, var(--delta-ink) 32%, transparent);
+  stroke-width: 1.2;
+  stroke-dasharray: 10 8;
+}
+
+.delta-target {
+  fill: none;
+  stroke: color-mix(in srgb, var(--delta-ink) 34%, transparent);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 5;
+}
+
+.delta-item {
+  fill: var(--accent);
+  stroke: var(--delta-ink);
+  stroke-width: 1.6;
+}
+
+/* Fixed structure */
+.delta-plate {
+  fill: var(--delta-fill);
+  stroke: var(--delta-ink);
+  stroke-width: var(--delta-line);
+  stroke-linejoin: round;
+}
+
+.delta-plate-side {
+  fill: var(--delta-deep);
+  stroke: var(--delta-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+/*
+ * The base plate doubles as a console screen: a dark panel set into the frame,
+ * with a scanline field and phosphor text lying in the plate's own plane.
+ */
+.delta-console-face {
+  fill: var(--console-bg);
+}
+
+.delta-console-grid {
+  fill: none;
+  stroke: var(--console-ink);
+  stroke-width: 3;
+  stroke-dasharray: 0.5 13;
+  stroke-opacity: 0.22;
+}
+
+.delta-console-glare {
+  fill: url(#delta-console-glare);
+  pointer-events: none;
+}
+
+.delta-console-text {
+  fill: var(--console-ink);
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 23px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--console-ink) 55%, transparent));
+}
+
+.delta-console-rule {
+  fill: none;
+  stroke: var(--console-ink);
+  stroke-width: 1.4;
+  stroke-opacity: 0.35;
+}
+
+.delta-console-status {
+  fill: var(--console-ink);
+  fill-opacity: 0.78;
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+}
+
+/* A slow CRT refresh band travelling down the screen. */
+.delta-console-sweep {
+  fill: url(#delta-console-sweep);
+  animation: delta-sweep 6.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes delta-sweep {
+  0% {
+    transform: translateY(-230px);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(230px);
+    opacity: 0;
+  }
+}
+
+/* Brackets fixing the screen into the frame. */
+.delta-bezel-plate {
+  fill: var(--delta-shade);
+  stroke: var(--delta-ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.delta-bezel-bolt {
+  fill: var(--delta-fill);
+  stroke: var(--delta-ink);
+  stroke-width: 1.6;
+}
+
+.delta-console-cursor {
+  fill: var(--console-ink);
+  animation: delta-blink 1.05s steps(1, end) infinite;
+}
+
+@keyframes delta-blink {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Output shaft running along the plate edge it is mounted on. */
+.delta-axle {
+  fill: none;
+  stroke: var(--delta-ink);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.delta-axle-cap {
+  fill: var(--delta-fill);
+  stroke: var(--delta-ink);
+  stroke-width: 2.2;
+}
+
+/* Members */
+.delta-bicep-outer {
+  fill: none;
+  stroke: var(--delta-ink);
+  stroke-width: 34;
+  stroke-linecap: round;
+}
+
+.delta-bicep-inner {
+  fill: none;
+  stroke: var(--delta-fill);
+  stroke-width: 27;
+  stroke-linecap: round;
+}
+
+.delta-rod {
+  fill: none;
+  stroke: var(--delta-ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.delta-joint {
+  fill: var(--delta-fill);
+  stroke: var(--delta-ink);
+  stroke-width: 2.4;
+}
+
+/* Moving platform */
+.delta-platform {
+  fill: var(--delta-fill);
+  stroke: var(--delta-ink);
+  stroke-width: var(--delta-line);
+  stroke-linejoin: round;
+}
+
+.delta-platform-edge {
+  fill: var(--delta-deep);
+  stroke: var(--delta-ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.delta-gripper {
+  fill: none;
+  stroke: var(--delta-ink);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

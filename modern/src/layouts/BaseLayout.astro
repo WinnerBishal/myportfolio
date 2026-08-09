@@ -1,0 +1,50 @@
+---
+import SiteHeader from "../components/SiteHeader.astro";
+import "katex/dist/katex.min.css";
+import "../styles/global.css";
+
+const {
+  title = "Bishal Adhikari",
+  description = "Robotics research portfolio"
+} = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en" data-theme="light" data-palette="modern-lab">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem("theme");
+        const darkPreferred = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved === "dark" || (!saved && darkPreferred) ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <SiteHeader currentPath={currentPath} />
+    <main class="shell">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell">
+        <p>Research ledger and project folios by Bishal Adhikari.</p>
+      </div>
+    </footer>
+    <script is:inline>
+      const toggleButton = document.getElementById("theme-toggle");
+      toggleButton?.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      });
+    </script>
+  </body>
+</html>

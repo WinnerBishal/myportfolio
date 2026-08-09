@@ -1,0 +1,22 @@
+---
+type Props = {
+  name: string;
+  description?: string;
+  tools?: string[];
+};
+
+const { name, description, tools = [] } = Astro.props;
+---
+
+<header class="project-masthead">
+  <a class="project-masthead__back" href="/projects">Projects</a>
+  <h1 class="project-masthead__title">{name}</h1>
+  {description && <p class="project-masthead__standfirst">{description}</p>}
+  {tools.length > 0 && (
+    <ul class="project-masthead__tools" aria-label="Tools used">
+      {tools.map((tool) => (
+        <li class="chip">{tool}</li>
+      ))}
+    </ul>
+  )}
+</header>

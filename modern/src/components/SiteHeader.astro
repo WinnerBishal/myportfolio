@@ -1,0 +1,35 @@
+---
+const { currentPath = "/" } = Astro.props;
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  { href: "/research", label: "Research" },
+  { href: "/search", label: "Search" }
+];
+---
+
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <a class="brand" href="/">Bishal Adhikari</a>
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                class="nav-link"
+                href={link.href}
+                aria-current={currentPath === link.href ? "page" : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle color theme">
+      Mode
+    </button>
+  </div>
+</header>

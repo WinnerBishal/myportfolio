@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Placeholder figure">
+  <defs>
+    <pattern id="hatch" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="26" stroke="#9aa3ab" stroke-width="1.4" opacity="0.45" />
+    </pattern>
+  </defs>
+  <rect width="800" height="1000" fill="#e7e9ec" />
+  <rect width="800" height="1000" fill="url(#hatch)" />
+  <rect x="0.75" y="0.75" width="798.5" height="998.5" fill="none" stroke="#7c858e" stroke-width="1.5" />
+  <line x1="0" y1="0" x2="800" y2="1000" stroke="#7c858e" stroke-width="1" opacity="0.5" />
+  <line x1="800" y1="0" x2="0" y2="1000" stroke="#7c858e" stroke-width="1" opacity="0.5" />
+  <rect x="152.0" y="420.0" width="496" height="160" fill="#e7e9ec" stroke="#7c858e" stroke-width="1.5" />
+  <text x="400.0" y="492.0" text-anchor="middle" font-family="IBM Plex Mono, SFMono-Regular, Consolas, monospace" font-size="50" font-weight="600" letter-spacing="5.0" fill="#5a636b">PLACEHOLDER</text>
+  <text x="400.0" y="544.8" text-anchor="middle" font-family="IBM Plex Mono, SFMono-Regular, Consolas, monospace" font-size="36" fill="#7c858e">4 : 5 &#183; 800&#215;1000</text>
+</svg>

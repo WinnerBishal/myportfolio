@@ -1,0 +1,74 @@
+---
+type Props = {
+  file: string;
+  title?: string;
+  pages?: number;
+  sizeMb?: number;
+  cover?: string;
+  name: string;
+};
+
+const { file, title, pages, sizeMb, cover, name } = Astro.props;
+
+const meta = [
+  pages ? `${pages} pages` : null,
+  sizeMb ? `${sizeMb} MB PDF` : null
+].filter(Boolean);
+---
+
+{/*
+  The PDF is the canonical document, so it gets a panel of its own rather than
+  being buried as a link. The viewer is not embedded on load — at this file size
+  that would cost every visitor the full download — so the reader opts in and the
+  iframe is created on click.
+*/}
+<section class="report" data-report>
+  <div class="report__card">
+    {cover && <img class="report__cover" src={cover} alt={`First page of ${title ?? name}`} loading="lazy" />}
+
+    <div class="report__body">
+      <p class="report__eyebrow">Full report</p>
+      <h2 class="report__title">{title ?? name}</h2>
+      {meta.length > 0 && <p class="report__meta">{meta.join(" · ")}</p>}
+
+      <div class="report__actions">
+        <button class="button-link" type="button" data-report-open>Read here</button>
+        <a class="button-link" href={file} target="_blank" rel="noopener noreferrer">Open in new tab</a>
+        <a class="button-link" href={file} download>Download</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="report__viewer" data-report-viewer hidden>
+    <div class="report__frame" data-report-frame data-src={file}></div>
+    <button class="report__close button-link" type="button" data-report-close>Close reader</button>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-report]").forEach((panel) => {
+    const viewer = panel.querySelector<HTMLElement>("[data-report-viewer]");
+    const frame = panel.querySelector<HTMLElement>("[data-report-frame]");
+    const open = panel.querySelector<HTMLButtonElement>("[data-report-open]");
+    const close = panel.querySelector<HTMLButtonElement>("[data-report-close]");
+    if (!viewer || !frame || !open || !close) return;
+
+    open.addEventListener("click", () => {
+      // Build the iframe on first open so the PDF is only fetched on request.
+      if (!frame.firstElementChild) {
+        const iframe = document.createElement("iframe");
+        iframe.src = frame.dataset.src ?? "";
+        iframe.title = "Report reader";
+        iframe.loading = "lazy";
+        frame.appendChild(iframe);
+      }
+      viewer.hidden = false;
+      viewer.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    close.addEventListener("click", () => {
+      viewer.hidden = true;
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+</script>
