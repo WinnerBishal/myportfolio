@@ -323,19 +323,82 @@ export function buildStatics(cfg: DeltaConfig = DELTA) {
   };
 }
 
-/** Resting places of the parts the robot moves, in pick order. */
-export const PICK_SPOTS: Vec3[] = [
-  { x: -135, y: -55, z: SURFACE_Z },
-  { x: -135, y: 10, z: SURFACE_Z },
-  { x: -135, y: 75, z: SURFACE_Z }
-];
+/** Conveyor lane the parts arrive on, and the bin the robot sorts them into. */
+export const LANE = {
+  x: -130,
+  from: -300,
+  to: 300,
+  halfWidth: 34,
+  z: SURFACE_Z
+};
 
-export const PLACE_SPOTS: Vec3[] = [
-  { x: 120, y: -55, z: SURFACE_Z },
-  { x: 120, y: 10, z: SURFACE_Z },
-  { x: 120, y: 75, z: SURFACE_Z }
-];
+export const BIN = {
+  x: 155,
+  y: -10,
+  hx: 80,
+  hy: 80,
+  floor: SURFACE_Z,
+  height: 55
+};
 
-export function itemPoint(spot: Vec3): Point {
-  return project({ ...spot, z: spot.z + 12 });
+/** Radius of a part, in world units. */
+export const ITEM_RADIUS = 17;
+
+/** Height the gripper releases a part from, just clear of the bin rim. */
+export const RELEASE_Z = BIN.floor + BIN.height + 34 + GRIP_HOLD;
+
+function quad(a: Vec3, b: Vec3, c: Vec3, d: Vec3): string {
+  return polygon([a, b, c, d]);
+}
+
+/**
+ * The lane and the bin, split into the faces that sit behind the parts and the
+ * faces that sit in front of them, so the caller can paint parts in between.
+ */
+export function buildScene(cfg: DeltaConfig = DELTA) {
+  const { x, from, to, halfWidth, z } = LANE;
+  const rail = (offset: number) =>
+    line({ x: x + offset, y: from, z }, { x: x + offset, y: to, z });
+
+  const ties: string[] = [];
+  for (let y = from; y <= to; y += 48) {
+    ties.push(line({ x: x - halfWidth, y, z }, { x: x + halfWidth, y, z }));
+  }
+
+  const { hx, hy, floor, height } = BIN;
+  const top = floor + height;
+  const corner = (sx: number, sy: number, sz: number) => ({
+    x: BIN.x + sx * hx,
+    y: BIN.y + sy * hy,
+    z: sz
+  });
+
+  return {
+    lane: {
+      rails: [rail(-halfWidth), rail(halfWidth)],
+      ties,
+      // A soft ground shadow so the lane reads as resting on something.
+      bed: quad(
+        { x: x - halfWidth, y: from, z },
+        { x: x + halfWidth, y: from, z },
+        { x: x + halfWidth, y: to, z },
+        { x: x - halfWidth, y: to, z }
+      )
+    },
+    bin: {
+      floor: quad(corner(-1, -1, floor), corner(1, -1, floor), corner(1, 1, floor), corner(-1, 1, floor)),
+      // Further from the viewer: drawn before the parts.
+      back: [
+        quad(corner(-1, -1, floor), corner(-1, 1, floor), corner(-1, 1, top), corner(-1, -1, top)),
+        quad(corner(-1, -1, floor), corner(1, -1, floor), corner(1, -1, top), corner(-1, -1, top))
+      ],
+      // Nearer the viewer: drawn after the parts, and kept translucent so the
+      // gripper stays visible when it reaches inside.
+      front: [
+        quad(corner(1, -1, floor), corner(1, 1, floor), corner(1, 1, top), corner(1, -1, top)),
+        quad(corner(-1, 1, floor), corner(1, 1, floor), corner(1, 1, top), corner(-1, 1, top))
+      ],
+      rim: polygon([corner(-1, -1, top), corner(1, -1, top), corner(1, 1, top), corner(-1, 1, top)])
+    }
+  };
 }

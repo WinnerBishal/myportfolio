@@ -1,5 +1,5 @@
 ---
-import { buildFrame, buildStatics, itemPoint, HOME, PICK_SPOTS, PLACE_SPOTS } from "../lib/delta";
+import { buildFrame, buildScene, buildStatics, HOME } from "../lib/delta";
 import {
   JOKE_LEFT,
   STATUS_AXES_Y,
@@ -14,6 +14,7 @@ import {
 // without JavaScript, with reduced motion, or on a narrow screen this frame is
 // what stays on the page — and it is a correct solution, not a placeholder.
 const statics = buildStatics();
+const scene = buildScene();
 const frame = buildFrame(HOME, 0, false);
 
 // Depth decides what the fixed plate and the moving platform hide. The two arms
@@ -32,9 +33,9 @@ const jokeLines = wrapJoke(randomJoke());
   <svg
     id="delta"
     class="delta__svg"
-    viewBox="-520 -250 990 1140"
+    viewBox="-495 -204 870 999"
     role="img"
-    aria-label="Diagram of a delta robot transferring parts between two stations"
+    aria-label="Diagram of a delta robot picking green parts off a conveyor and dropping them into a bin"
   >
     <defs>
       {/* Clip lives inside the plate's local space, so it follows the hexagon. */}
@@ -53,16 +54,33 @@ const jokeLines = wrapJoke(randomJoke());
       </linearGradient>
     </defs>
 
+    {/*
+      Stage order matters: everything the parts can sit behind is drawn first,
+      the parts next, and the bin's near walls last, so a part dropped inside
+      is correctly hidden by the wall in front of it.
+    */}
     <g class="delta-stage">
-      <path class="delta-surface" d={statics.surface} />
-      {PLACE_SPOTS.map((spot) => {
-        const p = itemPoint(spot);
-        return <circle class="delta-target" cx={p.x} cy={p.y} r="17" />;
-      })}
-      {PICK_SPOTS.map((spot, i) => {
-        const p = itemPoint(spot);
-        return <circle class="delta-item" id={`delta-item-${i}`} cx={p.x} cy={p.y} r="15" />;
-      })}
+      <path class="delta-lane-bed" d={scene.lane.bed} />
+      {scene.lane.ties.map((tie) => (
+        <path class="delta-lane-tie" d={tie} />
+      ))}
+      {scene.lane.rails.map((rail) => (
+        <path class="delta-lane-rail" d={rail} />
+      ))}
+
+      <g id="delta-lane-items" class="delta-items"></g>
+
+      <path class="delta-bin-floor" d={scene.bin.floor} />
+      {scene.bin.back.map((face) => (
+        <path class="delta-bin-back" d={face} />
+      ))}
+
+      <g id="delta-bin-items" class="delta-items"></g>
+
+      {scene.bin.front.map((face) => (
+        <path class="delta-bin-front" d={face} />
+      ))}
+      <path class="delta-bin-rim" d={scene.bin.rim} />
     </g>
 
     <g class="delta-arms delta-arms--behind">
@@ -128,13 +146,12 @@ const jokeLines = wrapJoke(randomJoke());
         ))}
       </g>
 
-
       {armIndices.map((i) => (
         <circle class="delta-joint" id={`delta-shoulder-${i}`} cx={frame.arms[i].shoulder.x} cy={frame.arms[i].shoulder.y} r="11" />
       ))}
     </g>
 
-    <g class="delta-effector">
+    <g class="delta-effector" id="delta-effector">
       <path class="delta-platform-edge" id="delta-platform-edge" d={frame.platformEdge} />
       <path class="delta-platform" id="delta-platform" d={frame.platform} />
       <path class="delta-gripper" id="delta-grip-l" d={frame.gripperLeft} />
@@ -158,13 +175,15 @@ const jokeLines = wrapJoke(randomJoke());
 
 <script>
   import {
-    buildFrame,
-    itemPoint,
+    BIN,
     HOME,
-    PICK_SPOTS,
-    PLACE_SPOTS,
+    ITEM_RADIUS,
+    LANE,
+    RELEASE_Z,
     TRAVEL_Z,
     WORK_Z,
+    buildFrame,
+    project,
     type Vec3
   } from "../lib/delta";
   import {
@@ -182,7 +201,9 @@ const jokeLines = wrapJoke(randomJoke());
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (svg && !reduceMotion) {
+    const SVG_NS = "http://www.w3.org/2000/svg";
     const pick = <T extends Element>(id: string) => svg.querySelector(id) as T;
+
     const arms = [0, 1, 2].map((i) => ({
       rodA: pick<SVGPathElement>(`#delta-rod-a-${i}`),
       rodB: pick<SVGPathElement>(`#delta-rod-b-${i}`),
@@ -195,25 +216,334 @@ const jokeLines = wrapJoke(randomJoke());
     const platformEdge = pick<SVGPathElement>("#delta-platform-edge");
     const gripLeft = pick<SVGPathElement>("#delta-grip-l");
     const gripRight = pick<SVGPathElement>("#delta-grip-r");
-    const items = [0, 1, 2].map((i) => pick<SVGCircleElement>(`#delta-item-${i}`));
+    const laneLayer = pick<SVGGElement>("#delta-lane-items");
+    const binLayer = pick<SVGGElement>("#delta-bin-items");
+    const effectorLayer = pick<SVGGElement>("#delta-effector");
     const consoleText = pick<SVGTextElement>("#delta-console-text");
     const consoleState = pick<SVGTextElement>("#delta-console-state");
     const consoleAxes = pick<SVGTextElement>("#delta-console-axes");
 
-    // What the machine is doing, keyed to the eight phases of one transfer.
-    const PHASE_LABELS = [
-      "APPROACH",
-      "DESCEND",
-      "GRIP",
-      "LIFT",
-      "TRANSFER",
-      "ALIGN",
-      "RELEASE",
-      "RETRACT"
-    ];
+    // ---- parts on the line -------------------------------------------------
 
-    // The plate console runs its own boot-then-joke program, rerolling the joke
-    // each time it loops, independent of the arm's pick cycle.
+    type Colour = "green" | "red" | "orange";
+    type Part = {
+      id: number;
+      colour: Colour;
+      x: number;
+      y: number;
+      z: number;
+      vx: number;
+      vy: number;
+      vz: number;
+      state: "lane" | "held" | "falling" | "settled" | "leaving";
+      el: SVGCircleElement;
+      fade: number;
+    };
+
+    const LANE_SPEED = 64;
+    const GRAVITY = -1150;
+    const R = ITEM_RADIUS;
+    const BIN_CAPACITY = 11;
+
+    let nextId = 1;
+    const parts: Part[] = [];
+    let sorted = 0;
+
+    function makePart(colour: Colour): Part {
+      const el = document.createElementNS(SVG_NS, "circle");
+      el.setAttribute("r", String(R));
+      el.setAttribute("class", `delta-item delta-item--${colour}`);
+      laneLayer.appendChild(el);
+      return {
+        id: nextId++,
+        colour,
+        x: LANE.x,
+        y: LANE.from,
+        z: LANE.z + R,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        state: "lane",
+        el,
+        fade: 1
+      };
+    }
+
+    function spawn() {
+      const roll = Math.random();
+      // Enough green to keep the arm busy without the line becoming monotone.
+      const colour: Colour = roll < 0.42 ? "green" : roll < 0.71 ? "red" : "orange";
+      const part = makePart(colour);
+      // A little scatter across the belt so the line does not look printed.
+      part.x = LANE.x + (Math.random() - 0.5) * 26;
+      parts.push(part);
+    }
+
+    let spawnIn = 0.4;
+
+    // ---- the arm -----------------------------------------------------------
+
+    type State = "idle" | "track" | "descend" | "grip" | "lift" | "carry" | "release" | "return";
+
+    let state: State = "idle";
+    let stateAge = 0;
+    let grip = 0;
+    let held: Part | null = null;
+    let targetPart: Part | null = null;
+    const pos: Vec3 = { ...HOME };
+
+    const LABELS: Record<State, string> = {
+      idle: "SCANNING",
+      track: "TRACKING",
+      descend: "DESCEND",
+      grip: "GRIP",
+      lift: "LIFT",
+      carry: "TRANSFER",
+      release: "RELEASE",
+      return: "HOMING"
+    };
+
+    function setState(next: State) {
+      state = next;
+      stateAge = 0;
+    }
+
+    /** Move towards a goal with a speed cap, so travel reads as deliberate. */
+    function approach(goal: Vec3, speed: number, dt: number) {
+      const dx = goal.x - pos.x;
+      const dy = goal.y - pos.y;
+      const dz = goal.z - pos.z;
+      const dist = Math.hypot(dx, dy, dz);
+      if (dist < 0.001) return 0;
+      const step = Math.min(dist, speed * dt);
+      pos.x += (dx / dist) * step;
+      pos.y += (dy / dist) * step;
+      pos.z += (dz / dist) * step;
+      return dist - step;
+    }
+
+    const dropPoint = () => ({
+      x: BIN.x + (Math.random() - 0.5) * 40,
+      y: BIN.y + (Math.random() - 0.5) * 40,
+      z: RELEASE_Z
+    });
+    let drop = dropPoint();
+
+    function chooseTarget() {
+      // The nearest green that has not yet passed the reachable window.
+      let best: Part | null = null;
+      for (const part of parts) {
+        if (part.state !== "lane" || part.colour !== "green") continue;
+        if (part.y > 40) continue;
+        if (!best || part.y > best.y) best = part;
+      }
+      return best;
+    }
+
+    function runArm(dt: number) {
+      stateAge += dt;
+
+      if (state === "idle") {
+        approach(HOME, 380, dt);
+        targetPart = chooseTarget();
+        if (targetPart) setState("track");
+      } else if (state === "track") {
+        if (!targetPart || targetPart.state !== "lane") {
+          setState("return");
+        } else {
+          // Sit above the part and match the belt until the two line up.
+          const goal = { x: targetPart.x, y: targetPart.y + 14, z: TRAVEL_Z };
+          approach(goal, 520, dt);
+          const gap = Math.hypot(pos.x - targetPart.x, pos.y - targetPart.y);
+          if (gap < 26 && targetPart.y > -150) setState("descend");
+        }
+      } else if (state === "descend") {
+        if (!targetPart || targetPart.state !== "lane") {
+          setState("return");
+        } else {
+          approach({ x: targetPart.x, y: targetPart.y + 4, z: WORK_Z }, 460, dt);
+          const gap = Math.hypot(pos.x - targetPart.x, pos.y - targetPart.y, pos.z - WORK_Z);
+          if (gap < 16) setState("grip");
+        }
+      } else if (state === "grip") {
+        if (targetPart && targetPart.state === "lane") {
+          approach({ x: targetPart.x, y: targetPart.y + 4, z: WORK_Z }, 460, dt);
+        }
+        grip = Math.min(1, grip + dt / 0.22);
+        if (grip >= 1) {
+          if (targetPart && targetPart.state === "lane") {
+            held = targetPart;
+            held.state = "held";
+            // Draw it with the gripper while carried.
+            effectorLayer.appendChild(held.el);
+            setState("lift");
+          } else {
+            setState("return");
+          }
+        }
+      } else if (state === "lift") {
+        approach({ x: pos.x, y: pos.y, z: TRAVEL_Z }, 420, dt);
+        if (pos.z >= TRAVEL_Z - 1) {
+          drop = dropPoint();
+          setState("carry");
+        }
+      } else if (state === "carry") {
+        const remaining = approach({ x: drop.x, y: drop.y, z: TRAVEL_Z }, 540, dt);
+        if (remaining < 6) setState("release");
+      } else if (state === "release") {
+        approach(drop, 320, dt);
+        if (Math.abs(pos.z - drop.z) < 8) {
+          grip = Math.max(0, grip - dt / 0.18);
+          if (grip <= 0 && held) {
+            held.state = "falling";
+            binLayer.appendChild(held.el);
+            held.vx = (Math.random() - 0.5) * 40;
+            held.vy = (Math.random() - 0.5) * 40;
+            held.vz = -20;
+            held = null;
+            sorted += 1;
+            setState("return");
+          }
+        }
+      } else if (state === "return") {
+        grip = Math.max(0, grip - dt / 0.2);
+        const remaining = approach(HOME, 480, dt);
+        if (remaining < 8) setState("idle");
+      }
+
+      if (held) {
+        held.x = pos.x;
+        held.y = pos.y;
+        held.z = pos.z - 62;
+      }
+    }
+
+    // ---- parts physics -----------------------------------------------------
+
+    function runParts(dt: number) {
+      spawnIn -= dt;
+      if (spawnIn <= 0) {
+        spawn();
+        spawnIn = 1.5 + Math.random() * 1.3;
+      }
+
+      const minX = BIN.x - BIN.hx + R;
+      const maxX = BIN.x + BIN.hx - R;
+      const minY = BIN.y - BIN.hy + R;
+      const maxY = BIN.y + BIN.hy - R;
+
+      for (const part of parts) {
+        if (part.state === "lane") {
+          part.y += LANE_SPEED * dt;
+          // Ease in over the first stretch so parts do not pop into existence.
+          part.fade = Math.min(1, (part.y - LANE.from) / 70);
+          if (part.y > LANE.to) part.state = "leaving";
+        } else if (part.state === "leaving") {
+          part.fade -= dt / 0.45;
+        } else if (part.state === "falling") {
+          part.vz += GRAVITY * dt;
+          part.x += part.vx * dt;
+          part.y += part.vy * dt;
+          part.z += part.vz * dt;
+
+          if (part.z < BIN.floor + R) {
+            part.z = BIN.floor + R;
+            part.vz = -part.vz * 0.16;
+            part.vx *= 0.68;
+            part.vy *= 0.68;
+          }
+          if (part.x < minX) { part.x = minX; part.vx = Math.abs(part.vx) * 0.45; }
+          if (part.x > maxX) { part.x = maxX; part.vx = -Math.abs(part.vx) * 0.45; }
+          if (part.y < minY) { part.y = minY; part.vy = Math.abs(part.vy) * 0.45; }
+          if (part.y > maxY) { part.y = maxY; part.vy = -Math.abs(part.vy) * 0.45; }
+
+          // Roll off whatever is already in the bin.
+          for (const other of parts) {
+            if (other === part || (other.state !== "settled" && other.state !== "falling")) continue;
+            const dx = part.x - other.x;
+            const dy = part.y - other.y;
+            const dz = part.z - other.z;
+            const d = Math.hypot(dx, dy, dz) || 0.001;
+            if (d < 2 * R) {
+              const push = (2 * R - d) / d;
+              part.x += dx * push * 0.85;
+              part.y += dy * push * 0.85;
+              part.z += dz * push * 0.85;
+              part.vx += dx * push * 7;
+              part.vy += dy * push * 7;
+              part.vz *= 0.45;
+            }
+          }
+
+          const resting =
+            part.z <= BIN.floor + R + 0.8 ||
+            parts.some(
+              (o) =>
+                o !== part &&
+                o.state === "settled" &&
+                part.z > o.z &&
+                Math.hypot(part.x - o.x, part.y - o.y, part.z - o.z) < 2 * R + 2
+            );
+          if (resting && Math.hypot(part.vx, part.vy, part.vz) < 26) {
+            part.state = "settled";
+            part.vx = part.vy = part.vz = 0;
+          }
+        }
+      }
+
+      // Keep the pile from overflowing the bin: retire the oldest.
+      const settled = parts.filter((p) => p.state === "settled");
+      if (settled.length > BIN_CAPACITY) {
+        for (const part of settled.slice(0, settled.length - BIN_CAPACITY)) {
+          part.state = "leaving";
+        }
+      }
+
+      for (let i = parts.length - 1; i >= 0; i -= 1) {
+        if (parts[i].fade <= 0) {
+          parts[i].el.remove();
+          parts.splice(i, 1);
+        }
+      }
+    }
+
+    // ---- drawing -----------------------------------------------------------
+
+    let laneOrder = "";
+    let binOrder = "";
+
+    function drawParts() {
+      const lane: Part[] = [];
+      const bin: Part[] = [];
+
+      for (const part of parts) {
+        const p = project(part);
+        part.el.setAttribute("cx", p.x.toFixed(1));
+        part.el.setAttribute("cy", p.y.toFixed(1));
+        part.el.setAttribute("opacity", Math.max(0, Math.min(1, part.fade)).toFixed(2));
+        if (part.state === "held") continue;
+        (part.state === "lane" ? lane : bin).push(part);
+      }
+
+      // Nearer parts paint last. Reordering only when the order actually
+      // changes keeps this to a handful of DOM writes.
+      for (const [group, layer, cache] of [
+        [lane, laneLayer, "lane"],
+        [bin, binLayer, "bin"]
+      ] as const) {
+        group.sort((a, b) => a.x + a.y - (b.x + b.y));
+        const key = group.map((p) => p.id).join(",");
+        if (cache === "lane" ? key !== laneOrder : key !== binOrder) {
+          for (const part of group) layer.appendChild(part.el);
+          if (cache === "lane") laneOrder = key;
+          else binOrder = key;
+        }
+      }
+
+    }
+
+    // ---- console -----------------------------------------------------------
+
     let program = consoleProgram(wrapJoke(randomJoke()));
     let programLength = consoleDuration(program);
     let programStart = 0;
@@ -227,13 +557,13 @@ const jokeLines = wrapJoke(randomJoke());
       const lines = consoleFrame.lines.length > 0 ? consoleFrame.lines : [""];
       consoleText.textContent = "";
       lines.forEach((line, i) => {
-        const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        const tspan = document.createElementNS(SVG_NS, "tspan");
         tspan.setAttribute("x", String(JOKE_LEFT));
         tspan.setAttribute("dy", String(lineOffset(i)));
         tspan.textContent = line;
 
         if (i === lines.length - 1) {
-          const cursor = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+          const cursor = document.createElementNS(SVG_NS, "tspan");
           cursor.setAttribute("class", "delta-console-cursor");
           cursor.textContent = "█";
           tspan.appendChild(cursor);
@@ -251,65 +581,14 @@ const jokeLines = wrapJoke(randomJoke());
       paintConsole(consoleFrameAt(program, elapsed - programStart));
     }
 
-    type Phase = { duration: number; to: Vec3; grip: number; carrying: number };
+    // ---- frame -------------------------------------------------------------
 
-    const above = (spot: Vec3): Vec3 => ({ x: spot.x, y: spot.y, z: TRAVEL_Z });
-    const at = (spot: Vec3): Vec3 => ({ x: spot.x, y: spot.y, z: WORK_Z });
-
-    // One transfer per part: approach, descend, close, lift, traverse,
-    // descend, release, lift. Then the platform returns home and the cycle
-    // repeats with the parts back where they started.
-    const phases: Phase[] = [];
-    for (let i = 0; i < PICK_SPOTS.length; i += 1) {
-      phases.push(
-        { duration: 0.95, to: above(PICK_SPOTS[i]), grip: 0, carrying: -1 },
-        { duration: 0.45, to: at(PICK_SPOTS[i]), grip: 0, carrying: -1 },
-        { duration: 0.35, to: at(PICK_SPOTS[i]), grip: 1, carrying: -1 },
-        { duration: 0.45, to: above(PICK_SPOTS[i]), grip: 1, carrying: i },
-        { duration: 1.0, to: above(PLACE_SPOTS[i]), grip: 1, carrying: i },
-        { duration: 0.45, to: at(PLACE_SPOTS[i]), grip: 1, carrying: i },
-        { duration: 0.35, to: at(PLACE_SPOTS[i]), grip: 0, carrying: i },
-        { duration: 0.45, to: above(PLACE_SPOTS[i]), grip: 0, carrying: -1 }
-      );
-    }
-    phases.push({ duration: 0.9, to: HOME, grip: 0, carrying: -1 });
-
-    const cycle = phases.reduce((sum, phase) => sum + phase.duration, 0);
-    const smooth = (t: number) => t * t * (3 - 2 * t);
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-
-    function poseAt(elapsed: number) {
-      let time = elapsed % cycle;
-      let from = HOME;
-      let grip = 0;
-
-      for (let index = 0; index < phases.length; index += 1) {
-        const phase = phases[index];
-        if (time < phase.duration) {
-          const t = smooth(time / phase.duration);
-          return {
-            target: {
-              x: lerp(from.x, phase.to.x, t),
-              y: lerp(from.y, phase.to.y, t),
-              z: lerp(from.z, phase.to.z, t)
-            },
-            grip: lerp(grip, phase.grip, t),
-            carrying: phase.carrying,
-            phase: index
-          };
-        }
-        time -= phase.duration;
-        from = phase.to;
-        grip = phase.grip;
-      }
-
-      return { target: HOME, grip: 0, carrying: -1, phase: phases.length };
-    }
-
-    function render(elapsed: number) {
+    function render(elapsed: number, dt: number) {
+      runParts(dt);
+      runArm(dt);
       renderConsole(elapsed);
-      const pose = poseAt(elapsed);
-      const frame = buildFrame(pose.target, pose.grip, pose.carrying >= 0);
+
+      const frame = buildFrame(pos, grip, held !== null);
 
       arms.forEach((arm, i) => {
         arm.rodA.setAttribute("d", frame.arms[i].rodA);
@@ -322,56 +601,38 @@ const jokeLines = wrapJoke(randomJoke());
         arm.wrist.setAttribute("cy", String(frame.arms[i].wrist.y));
       });
 
-      const part = Math.min(Math.floor(pose.phase / 8) + 1, PICK_SPOTS.length);
-      const label = pose.phase >= PHASE_LABELS.length * PICK_SPOTS.length
-        ? "HOMING"
-        : `${PHASE_LABELS[pose.phase % 8]} ${part}/${PICK_SPOTS.length}`;
-      consoleState.textContent = `> ${label}`;
-      consoleAxes.textContent = frame.arms
-        .map((arm, i) => `A${i + 1} ${Math.round(arm.theta).toString().padStart(3, "0")}`)
-        .join("  ");
-
       platform.setAttribute("d", frame.platform);
       platformEdge.setAttribute("d", frame.platformEdge);
       gripLeft.setAttribute("d", frame.gripperLeft);
       gripRight.setAttribute("d", frame.gripperRight);
 
-      // Each part sits at its pick spot until its own release phase has run;
-      // the eight phases of a transfer belong to part `index / 8`.
-      const transferred = Math.floor((pose.phase + 1) / 8);
-      items.forEach((item, i) => {
-        let point;
-        if (pose.carrying === i) {
-          point = frame.payload;
-        } else if (i < transferred) {
-          point = itemPoint(PLACE_SPOTS[i]);
-        } else {
-          point = itemPoint(PICK_SPOTS[i]);
-        }
-        item.setAttribute("cx", String(point.x));
-        item.setAttribute("cy", String(point.y));
-      });
+      consoleState.textContent = `> ${LABELS[state]}  ${String(sorted).padStart(3, "0")}`;
+      consoleAxes.textContent = frame.arms
+        .map((arm, i) => `A${i + 1} ${Math.round(arm.theta).toString().padStart(3, "0")}`)
+        .join("  ");
+
+      drawParts();
     }
 
     let running = false;
     let raf = 0;
-    let origin = 0;
-    // Total animated time, held across pauses so the cycle resumes in place.
+    let last = 0;
     let elapsed = 0;
-    let resumeFrom = 0;
 
     const tick = (now: number) => {
-      if (!origin) origin = now;
-      elapsed = resumeFrom + (now - origin) / 1000;
-      render(elapsed);
+      if (!last) last = now;
+      // Clamp so a backgrounded tab does not resume with one giant step.
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      elapsed += dt;
+      render(elapsed, dt);
       raf = requestAnimationFrame(tick);
     };
 
     function start() {
       if (running) return;
       running = true;
-      origin = 0;
-      resumeFrom = elapsed;
+      last = 0;
       raf = requestAnimationFrame(tick);
     }
 

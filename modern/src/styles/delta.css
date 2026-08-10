@@ -32,25 +32,85 @@
   overflow: visible;
 }
 
-/* Stage */
-.delta-surface {
-  fill: color-mix(in srgb, var(--delta-shade) 40%, transparent);
-  stroke: color-mix(in srgb, var(--delta-ink) 32%, transparent);
-  stroke-width: 1.2;
-  stroke-dasharray: 10 8;
+/* Stage: the conveyor the parts arrive on, and the bin they are sorted into. */
+.delta-lane-bed {
+  fill: color-mix(in srgb, var(--delta-shade) 45%, transparent);
+  stroke: none;
 }
 
-.delta-target {
+.delta-lane-rail {
   fill: none;
-  stroke: color-mix(in srgb, var(--delta-ink) 34%, transparent);
-  stroke-width: 1.2;
-  stroke-dasharray: 5 5;
+  stroke: color-mix(in srgb, var(--delta-ink) 55%, transparent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
 }
 
-.delta-item {
-  fill: var(--accent);
+/* Dashes drift along the rails, which is the only cue the belt is moving. */
+.delta-lane-tie {
+  fill: none;
+  stroke: color-mix(in srgb, var(--delta-ink) 26%, transparent);
+  stroke-width: 1.6;
+}
+
+.delta-bin-floor {
+  fill: color-mix(in srgb, var(--delta-deep) 75%, transparent);
+  stroke: color-mix(in srgb, var(--delta-ink) 30%, transparent);
+  stroke-width: 1.2;
+}
+
+.delta-bin-back {
+  fill: color-mix(in srgb, var(--delta-shade) 80%, transparent);
   stroke: var(--delta-ink);
   stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+/*
+ * The near walls are drawn over the parts inside so the bin reads as a box with
+ * depth, but kept translucent so a part settling behind them stays visible.
+ */
+.delta-bin-front {
+  fill: color-mix(in srgb, var(--delta-fill) 42%, transparent);
+  stroke: var(--delta-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.delta-bin-rim {
+  fill: none;
+  stroke: var(--delta-ink);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+/* Parts. Colour is the whole point: only the green ones get picked. */
+.delta-item {
+  stroke: color-mix(in srgb, var(--delta-ink) 70%, transparent);
+  stroke-width: 1.4;
+}
+
+.delta-item--green {
+  fill: #4fae5a;
+}
+
+.delta-item--red {
+  fill: #d1483c;
+}
+
+.delta-item--orange {
+  fill: #e08a2e;
+}
+
+:root[data-theme="dark"] .delta-item--green {
+  fill: #58c165;
+}
+
+:root[data-theme="dark"] .delta-item--red {
+  fill: #e05a4c;
+}
+
+:root[data-theme="dark"] .delta-item--orange {
+  fill: #eb9a3c;
 }
 
 /* Fixed structure */
