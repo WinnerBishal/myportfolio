@@ -22,8 +22,27 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/space-grotesk-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/space-grotesk-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
+  /* Orbitron for the machine voice; Space Grotesk where that has to be read at
+     length — technical in feel, but with normal letterforms. */
   --font-display: "Orbitron", "Eurostile", ui-sans-serif, system-ui, sans-serif;
+  --font-title: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 }
 
@@ -121,8 +140,11 @@ a:hover {
 }
 
 .brand {
-  font: 600 0.9rem/1.2 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
-  letter-spacing: 0.06em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
 }
@@ -137,30 +159,84 @@ a:hover {
 }
 
 .nav-link {
-  font: 500 0.74rem/1.2 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.05em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.66rem;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
-  padding: 0.35rem 0.55rem;
-  border-radius: 0.35rem;
+  padding: 0.42rem 0.62rem;
+  border-radius: 0;
   border: 1px solid transparent;
+  color: var(--muted);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--border) 80%, transparent);
 }
 
 .nav-link[aria-current="page"] {
-  border-color: var(--border);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--aura) 45%, var(--border));
   background: color-mix(in srgb, var(--surface-strong) 88%, white);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 80%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--border) 60%, transparent);
 }
 
 .theme-button {
+  display: inline-grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
   border: 1px solid var(--border);
-  border-radius: 0.35rem;
+  border-radius: 0;
   background: var(--surface);
   color: var(--text);
-  padding: 0.35rem 0.55rem;
-  font: 600 0.7rem/1.1 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.theme-button:hover {
+  border-color: color-mix(in srgb, var(--aura) 60%, var(--border));
+  color: var(--brand-ink);
+}
+
+.theme-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-icon--moon {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Show the mode the button switches to. */
+.theme-icon--sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon--sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .theme-icon--moon {
+  display: none;
 }
 
 .theme-button:focus-visible,
@@ -409,14 +485,18 @@ a:focus-visible {
 
 .intro__actions .button-link:hover,
 .intro__actions .button-link:focus-visible {
+  transform: translateY(-2px);
   border-color: var(--aura);
+  color: var(--brand-ink);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white 90%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 95%, transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--border) 70%, transparent),
-    inset 1px 0 0 color-mix(in srgb, white 60%, transparent),
+    inset 1px 0 0 color-mix(in srgb, white 65%, transparent),
     inset -1px 0 0 color-mix(in srgb, var(--border) 45%, transparent),
-    0 1px 0 color-mix(in srgb, var(--border) 55%, transparent),
-    0 0 12px color-mix(in srgb, var(--aura) 30%, transparent);
+    /* the raised edge */
+    0 3px 0 color-mix(in srgb, var(--border) 65%, transparent),
+    0 5px 10px color-mix(in srgb, var(--brand-ink) 16%, transparent),
+    0 0 14px color-mix(in srgb, var(--aura) 34%, transparent);
 }
 
 .intro__actions .button-link:active {
@@ -425,6 +505,18 @@ a:focus-visible {
     inset 0 2px 3px color-mix(in srgb, var(--border) 65%, transparent),
     inset 0 -1px 0 color-mix(in srgb, white 55%, transparent),
     0 0 8px color-mix(in srgb, var(--aura) 22%, transparent);
+}
+
+:root[data-theme="dark"] .intro__actions .button-link:hover,
+:root[data-theme="dark"] .intro__actions .button-link:focus-visible {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--aura) 45%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, black 45%, transparent),
+    inset 1px 0 0 color-mix(in srgb, var(--aura) 22%, transparent),
+    inset -1px 0 0 color-mix(in srgb, black 35%, transparent),
+    0 3px 0 color-mix(in srgb, black 55%, transparent),
+    0 5px 12px color-mix(in srgb, black 45%, transparent),
+    0 0 16px color-mix(in srgb, var(--aura) 26%, transparent);
 }
 
 :root[data-theme="dark"] .intro__actions .button-link {
@@ -576,6 +668,18 @@ a:focus-visible {
   }
 }
 
+/*
+ * Running text is justified for a squared-off block, with hyphenation on so the
+ * word spacing stays even rather than opening rivers.
+ */
+.content-shell p,
+.feed-entry__summary,
+.project-masthead__standfirst {
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
 /* Research listing: authors, tags, and a link to the published version. */
 .research-entry__authors {
   grid-column: 2;
@@ -620,6 +724,122 @@ a:focus-visible {
   .research-entry__foot {
     grid-column: 1;
   }
+}
+
+/*
+ * Paper page. Held to a reading measure rather than the full shell — the old
+ * layout ran the abstract across the whole 1120px, which is unreadable — and
+ * flat, matching the project mastheads rather than the old boxed panel.
+ */
+.paper {
+  max-width: 80ch;
+  margin: 1.7rem 0 0;
+}
+
+.paper__head {
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.paper__title {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  line-height: 1.28;
+  letter-spacing: 0.005em;
+}
+
+.paper__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.85rem 0 0;
+  font: 500 0.72rem/1.5 var(--font-mono);
+  color: var(--muted);
+}
+
+.paper__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.paper__tag {
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  padding: 0.03rem 0.32rem;
+  font-size: 0.62rem;
+  text-transform: lowercase;
+}
+
+/* Authors read as a byline, not a grid of cards. */
+.paper__authors {
+  margin: 0.8rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.9;
+  color: var(--text);
+}
+
+.paper__sep {
+  margin: 0 0.4rem;
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.paper__author {
+  white-space: nowrap;
+}
+
+.paper__orcid {
+  margin-left: 0.25rem;
+  padding: 0 0.22rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  font: 600 0.58rem/1.5 var(--font-mono);
+  vertical-align: 0.12em;
+  text-decoration: none;
+  color: var(--brand-ink);
+}
+
+.paper__orcid:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.paper__label {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.paper__abstract {
+  margin-top: 1.5rem;
+}
+
+.paper__abstract p {
+  margin: 0;
+  font-size: 0.87rem;
+  line-height: 1.85;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.paper__actions {
+  margin: 1.5rem 0 0;
+}
+
+.paper__actions .button-link {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+
+.paper__body {
+  margin-top: 1.6rem;
 }
 
 /* Front door for a tool that lives elsewhere. */
@@ -693,6 +913,18 @@ a:focus-visible {
 /* Home feed: articles, news, and short notes in one dated stream. */
 .feed {
   padding-bottom: 1.5rem;
+}
+
+/* When a section head leads the page it needs the same top breathing room the
+   project masthead gets; on the home page the feed follows the intro instead. */
+main.shell > .feed:first-child,
+main.shell > .feed__head:first-child {
+  margin-top: 1.7rem;
+}
+
+/* A head already provides separation, so the grid below it sits closer. */
+.feed__head + .tile-grid {
+  margin-top: 0.9rem;
 }
 
 .feed__head {
@@ -772,7 +1004,12 @@ a:focus-visible {
 .feed-entry__title {
   grid-column: 2;
   margin: 0;
-  font: 600 clamp(1rem, 1.6vw, 1.18rem)/1.3 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  /* Technical in character but built to be read at length. */
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.35;
+  letter-spacing: 0.005em;
 }
 
 .feed-entry__title a {

@@ -64,7 +64,10 @@ const narrowRows = justifyRows(tiles, aspectOf, {
   title="Projects | Bishal Adhikari"
   description="Published project portfolio with preserved legacy URL behavior."
 >
-  <h1 class="visually-hidden">Projects</h1>
+  <div class="feed__head">
+    <h1 class="feed__title">Projects</h1>
+    <span class="feed__all">{tiles.length} {tiles.length === 1 ? "project" : "projects"}</span>
+  </div>
 
   <section class="tile-grid" aria-label="Projects folio grid">
     {

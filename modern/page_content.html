@@ -1,0 +1,629 @@
+<!DOCTYPE html><html lang="en" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Design and development of solar panel deployment system in 1.5P PocketQube satellite."><meta name="generator" content="Astro v6.1.8"><title>Deployable Solar Panel in PoketQube Satellite | Bishal Adhikari</title><script>
+      (() => {
+        const saved = localStorage.getItem("theme");
+        const darkPreferred = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved === "dark" || (!saved && darkPreferred) ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script><style data-vite-dev-id="/Users/ba974/Portfolio/myportfolio/modern/node_modules/katex/dist/katex.min.css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(/node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;position:relative;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.45"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+<style data-vite-dev-id="/Users/ba974/Portfolio/myportfolio/modern/src/styles/global.css">:root {
+  --bg: #e9dfcf;
+  --surface: #f6efdf;
+  --surface-strong: #efe4ce;
+  --text: #1d1a17;
+  --muted: #4f473d;
+  --brand: #2f4a63;
+  --brand-ink: #22384d;
+  --ring: #86652c;
+  --border: #c6b79b;
+  --accent: #7b5b2e;
+}
+
+:root[data-theme="dark"] {
+  --bg: #171613;
+  --surface: #211e1a;
+  --surface-strong: #2d2822;
+  --text: #ebe2d4;
+  --muted: #b6ab99;
+  --brand: #8eaac3;
+  --brand-ink: #b8cbdd;
+  --ring: #d9b676;
+  --border: #4a4136;
+  --accent: #bd9a63;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--accent) 11%, transparent) 0, transparent 34%),
+    radial-gradient(circle at 86% 88%, color-mix(in srgb, var(--brand) 14%, transparent) 0, transparent 36%),
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--surface) 82%, transparent) 0,
+      color-mix(in srgb, var(--surface) 82%, transparent) 35px,
+      color-mix(in srgb, var(--border) 35%, transparent) 36px
+    ),
+    var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--brand-ink);
+  text-decoration-style: dotted;
+  text-underline-offset: 0.18rem;
+}
+
+a:hover {
+  text-decoration-thickness: 1px;
+}
+
+.shell {
+  width: min(1120px, 93vw);
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.72rem 0;
+}
+
+.brand {
+  font: 600 0.9rem/1.2 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  font: 500 0.74rem/1.2 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.35rem;
+  border: 1px solid transparent;
+}
+
+.nav-link[aria-current="page"] {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--surface-strong) 88%, white);
+}
+
+.theme-button {
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.35rem 0.55rem;
+  font: 600 0.7rem/1.1 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.theme-button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.hero,
+.page-lead {
+  position: relative;
+  margin-top: 1.6rem;
+  padding: 1.7rem 1.5rem 1.4rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, white);
+}
+
+.hero::before,
+.page-lead::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 7.6%,
+    color-mix(in srgb, var(--accent) 23%, transparent) 7.7%,
+    transparent 7.85%,
+    transparent 100%
+  );
+}
+
+.hero h1,
+.page-lead h1 {
+  margin: 0;
+  font: 600 clamp(1.45rem, 3.2vw, 2.2rem)/1.15 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.hero p,
+.page-lead p {
+  margin-top: 0.7rem;
+  max-width: 72ch;
+  font-size: 0.83rem;
+  color: var(--muted);
+}
+
+.hero-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1.3fr 0.9fr;
+  align-items: center;
+}
+
+.profile-card {
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--surface-strong) 76%, white);
+}
+
+.profile-card img {
+  width: 100%;
+  border-radius: 0.28rem;
+  border: 1px solid var(--border);
+  max-height: 280px;
+  object-fit: cover;
+  filter: saturate(0.72) contrast(0.95);
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.button-link {
+  font: 600 0.72rem/1.2 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  padding: 0.35rem 0.55rem;
+  background: color-mix(in srgb, var(--surface) 85%, white);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--surface) 90%, white);
+  padding: 0.85rem 0.9rem;
+  transition: border-color 160ms ease;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--brand) 36%, var(--border));
+}
+
+.card h3 {
+  font: 600 1rem/1.25 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+}
+
+.card p {
+  font-size: 0.8rem;
+  margin: 0.4rem 0;
+}
+
+.chip {
+  display: inline-block;
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+  border: 1px dashed color-mix(in srgb, var(--border) 88%, transparent);
+  border-radius: 0.2rem;
+  padding: 0.08rem 0.38rem;
+  background: color-mix(in srgb, var(--surface-strong) 82%, white);
+  font: 500 0.66rem/1.35 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.muted-text {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.project-cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
+  margin-bottom: 0.6rem;
+  filter: saturate(0.72) brightness(0.95) contrast(0.94);
+}
+
+.site-footer {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding: 1rem 0 1.2rem;
+  font: 500 0.7rem/1.4 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.route-note {
+  margin: 0.85rem 0 0;
+  border-left: 3px solid color-mix(in srgb, var(--accent) 70%, var(--brand));
+  padding: 0.35rem 0.6rem;
+  font: 500 0.7rem/1.5 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+}
+
+.content-shell {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--surface) 90%, white);
+  padding: clamp(0.85rem, 2vw, 1.5rem);
+  font-size: 0.84rem;
+}
+
+.content-shell :where(h1, h2, h3, h4) {
+  font-family: "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  line-height: 1.24;
+}
+
+.content-shell :where(img, video) {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 0.3rem;
+}
+
+:root[data-theme="dark"] .content-shell :where(img, video),
+:root[data-theme="dark"] .project-cover,
+:root[data-theme="dark"] .folio-strip__meta img {
+  filter: brightness(1.08) saturate(1.02) contrast(1.02);
+  mix-blend-mode: normal;
+}
+
+.content-shell pre {
+  overflow-x: auto;
+  border-radius: 0.2rem;
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.content-shell table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-shell th,
+.content-shell td {
+  border: 1px solid var(--border);
+  padding: 0.4rem;
+}
+
+.folio-list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1px;
+  background: color-mix(in srgb, var(--border) 76%, transparent);
+}
+
+.folio-strip {
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  gap: 1rem;
+  background: color-mix(in srgb, var(--surface) 90%, white);
+  min-height: 215px;
+}
+
+.folio-strip--reverse {
+  grid-template-columns: 0.92fr 1.08fr;
+}
+
+.folio-strip__summary {
+  padding: 0.95rem 1rem;
+  border-right: 1px solid var(--border);
+}
+
+.folio-strip--reverse .folio-strip__summary {
+  order: 2;
+  border-right: 0;
+  border-left: 1px solid var(--border);
+}
+
+.folio-strip--reverse .folio-strip__meta {
+  order: 1;
+}
+
+.folio-strip__index {
+  margin: 0;
+  color: var(--accent);
+  font: 600 0.64rem/1.2 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+.folio-strip h2 {
+  margin: 0.5rem 0 0;
+  font: 600 clamp(1rem, 2.2vw, 1.25rem)/1.24 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+}
+
+.folio-strip__summary > p {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.folio-strip__tools {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.folio-strip__tools li {
+  border: 1px dashed color-mix(in srgb, var(--border) 85%, transparent);
+  padding: 0.1rem 0.35rem;
+  font: 500 0.66rem/1.3 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-strong) 74%, white);
+}
+
+.folio-strip__summary a {
+  display: inline-block;
+  margin-top: 0.72rem;
+  font: 600 0.73rem/1.2 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.folio-strip__meta {
+  min-height: 100%;
+  background: color-mix(in srgb, var(--surface-strong) 68%, white);
+}
+
+.folio-strip__meta img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.62) contrast(0.92) brightness(0.96);
+  mix-blend-mode: multiply;
+}
+
+.folio-strip__placeholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  text-align: center;
+  color: var(--muted);
+  font: 500 0.7rem/1.45 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background-image:
+    linear-gradient(45deg, transparent 49.2%, color-mix(in srgb, var(--border) 58%, transparent) 50%, transparent 50.8%),
+    linear-gradient(-45deg, transparent 49.2%, color-mix(in srgb, var(--border) 58%, transparent) 50%, transparent 50.8%);
+  background-size: 34px 34px;
+}
+
+.ledger-list {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+}
+
+.ledger-row {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 0.9fr 2.6fr 0.8fr;
+  align-items: baseline;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, white);
+}
+
+.ledger-row:last-child {
+  border-bottom: 0;
+}
+
+.ledger-row__date {
+  color: var(--muted);
+  font: 500 0.68rem/1.3 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.ledger-row__title {
+  font: 600 0.93rem/1.3 "IBM Plex Serif", "Palatino Linotype", Georgia, serif;
+  margin: 0;
+}
+
+.ledger-row__summary {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.ledger-row__action {
+  text-align: right;
+  font: 600 0.69rem/1.2 "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+}
+
+@media (max-width: 780px) {
+  .site-header__inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero,
+  .page-lead {
+    padding: 1.2rem 1rem 1rem;
+  }
+
+  .folio-strip,
+  .folio-strip--reverse {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .folio-strip__summary,
+  .folio-strip--reverse .folio-strip__summary {
+    order: 2;
+    border-left: 0;
+    border-right: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .folio-strip__meta,
+  .folio-strip--reverse .folio-strip__meta {
+    order: 1;
+    min-height: 180px;
+  }
+
+  .ledger-row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .ledger-row__action {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style><script type="module" src="/@vite/client"></script>
+<script type="module" src="/@id/astro/runtime/client/dev-toolbar/entrypoint.js"></script>
+<script>window.__astro_dev_toolbar__ = {"root":"/Users/ba974/Portfolio/myportfolio/modern/","version":"6.1.8","debugInfo":"Astro                    v6.1.8\nNode                     v24.14.0\nSystem                   macOS (arm64)\nPackage Manager          npm\nOutput                   static\nAdapter                  none\nIntegrations             none"}</script>
+<script type="module" src="/node_modules/katex/dist/katex.min.css"></script>
+<script type="module" src="/src/styles/global.css"></script></head> <body data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/layouts/BaseLayout.astro" data-astro-source-loc="30:9"> <header class="site-header" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="11:29"> <div class="shell site-header__inner" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="12:41"> <a class="brand" href="/" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="13:31">Bishal Adhikari</a> <nav aria-label="Primary" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="14:31"> <ul class="nav-list" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="15:28"> <li data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="18:17"> <a class="nav-link" href="/" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="23:16"> Home </a> </li><li data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="18:17"> <a class="nav-link" href="/projects" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="23:16"> Projects </a> </li><li data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="18:17"> <a class="nav-link" href="/articles" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="23:16"> Articles </a> </li><li data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="18:17"> <a class="nav-link" href="/search" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="23:16"> Search </a> </li> </ul> </nav> <button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle color theme" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/components/SiteHeader.astro" data-astro-source-loc="31:98">
+Mode
+</button> </div> </header> <main class="shell" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/layouts/BaseLayout.astro" data-astro-source-loc="32:25">  <section class="page-lead" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="22:30"> <h1 data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="23:9">Deployable Solar Panel in PoketQube Satellite</h1> <p class="route-note" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="24:27">Legacy permalink preserved: /solar_panel/</p> <p data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="26:10"> <span class="chip" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="28:30">3D Printing</span><span class="chip" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="28:30">Ansys</span><span class="chip" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="28:30">PocketQube</span> </p> </section> <img class="project-cover" src="/assets/images/solar_panel.gif" alt="Deployable Solar Panel in PoketQube Satellite" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="35:6"><article class="content-shell" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/pages/[...legacyProject].astro" data-astro-source-loc="38:34"> <h1 id="design-process-of-the-deployable-solar-panels-system-for-pocketqube-satellite">Design Process of the Deployable Solar Panels System for PocketQube Satellite</h1>
+<p>The design process of the mechanical system for deployable solar panels and the electromechanical actuation system follows several key principles to ensure efficiency, stability, and manufacturability. This section details the considerations and process designs involved in the development of the solar panel deployment system for the PocketQube satellite.</p>
+<h2 id="key-design-considerations">Key Design Considerations</h2>
+<h3 id="actuation-mechanism">Actuation Mechanism</h3>
+<p>One of the primary considerations for the actuation mechanism was to minimize or eliminate the need for electrical energy, as conserving power is critical for the operation of picosatellites. To achieve this, a torsion spring was selected for the actuation mechanism. Torsion springs provide a reliable mechanical solution for deploying the solar panels without requiring continuous electrical power. The spring stores mechanical energy when twisted and releases it to deploy the panels when needed, ensuring a simple yet effective deployment system.</p>
+<p><img src="/assets/images/image.png" alt="Deployed Configuration"></p>
+<div style="text-align: center;">
+    Fig: Deployed configuration of PocketQube
+</div>
+<h3 id="deployment">Deployment</h3>
+<p>The deployment process needed to be both stable and efficient to ensure the solar panels would deploy correctly and remain in position throughout the satellite’s mission. The design utilized a heating mechanism to release a binding thread that held the panels in their stowed position. When heated, the thread would break, allowing the torsion spring to deploy the panels. This method provides a controlled and reliable way to trigger the deployment at the appropriate time.</p>
+<h3 id="space">Space</h3>
+<p>Given the limited space available on a picosatellite, it was crucial to design the deployment system to fit within the permissible cross-section of 50 x 50 mm² when the panels are in their non-deployed condition. To optimize the use of space, the hinge thickness was minimized. This reduction in hinge size helps to ensure that the deployment mechanism can fit within the compact confines of the satellite without compromising structural integrity or functionality.</p>
+<p><img src="/assets/images/image-1.png" alt="Thin Hinge (Left) and Thick Hinge (Right)"></p>
+<div style="text-align: center;">
+    Fig: Comparison of two designs : Thin Hinge (Left) and Thick Hinge (Right)
+</div>
+<h3 id="fabrication">Fabrication</h3>
+<p>Ease of manufacture was another important consideration in the design process. The deployment system was designed with 3D printing in mind, allowing for rapid prototyping and cost-effective production of components. 3D printing offers the flexibility to produce complex geometries that would be challenging or expensive to manufacture using traditional methods.</p>
+<h2 id="evolution-of-the-hinge-design">Evolution of the Hinge Design</h2>
+<p>The hinge design evolved from thin and weak structures to thicker and stronger configurations.</p>
+<ul>
+<li><strong>Thin Hinge:</strong> Space-efficient but weak when 3D printed.</li>
+<li><strong>Thick Hinge:</strong> Occupies more space but provides increased strength due to higher material concentration.</li>
+</ul>
+<p>Finite element analysis (FEA) was used to verify the increased strength in the thick hinges.</p>
+<p><img src="/assets/images/image-2.png" alt="Thick Hinges Static Structural : Deformation"></p>
+<div style="text-align: center;">
+    Fig: Deformation analysis under cylindrical force
+</div>
+<p><img src="/assets/images/image-3.png" alt="Thick Hinges Static Structural : Stress"></p>
+<div style="text-align: center;">
+    Fig: Stress analysis under cylindrical force
+</div>
+<h3 id="challenges-and-customization">Challenges and Customization</h3>
+<p>The hinge design was customized to minimize interference with other parts of the satellite or the deployer pod. The 3D printing process necessitated careful design adjustments to reduce shear force along the layer addition direction.</p>
+<h2 id="shaft-and-spring-design">Shaft and Spring Design</h2>
+<h3 id="shaft">Shaft</h3>
+<p>The shaft was designed using a 2 mm thick copper screw rod. The screw rod allowed the shaft to be locked in place with nuts on both sides of the hinges.</p>
+<h3 id="spring">Spring</h3>
+<p>The design of the torsion spring was critical for effective deployment. The spring constant (k) was calculated using:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>k</mi><mo>=</mo><mfrac><mrow><msup><mi>d</mi><mn>4</mn></msup><mi>E</mi></mrow><mrow><mn>64</mn><msub><mi>D</mi><mi>m</mi></msub><msub><mi>N</mi><mi>a</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">k = \frac{d^4 E}{64 D_m N_a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.3271em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">64</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p>Where:</p>
+<ul>
+<li>(d = 0.5 , \text{mm}): Wire diameter</li>
+<li>(E = 200 \times 10^3 , \text{N/mm}^2): Modulus of elasticity</li>
+<li>(D_m = D_{\text{outer}} - D_{\text{wire}} = 3.8 - 0.5 = 3.3 , \text{mm}): Mean coil diameter</li>
+<li>(N_a = 6): Number of active coils</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>k</mi><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mn>0.5</mn><msup><mo stretchy="false">)</mo><mn>4</mn></msup><mo>×</mo><mn>200</mn><mo>×</mo><msup><mn>10</mn><mn>3</mn></msup></mrow><mrow><mn>64</mn><mo>×</mo><mn>3.3</mn><mo>×</mo><mn>6</mn></mrow></mfrac><mo>=</mo><mn>15.52</mn><mtext> </mtext><mtext>N-mm/rad</mtext></mrow><annotation encoding="application/x-tex">k = \frac{(0.5)^4 \times 200 \times 10^3}{64 \times 3.3 \times 6} = 15.52 \, \text{N-mm/rad}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2604em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">3.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">6</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">(</span><span class="mord">0.5</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">15.52</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">N-mm/rad</span></span></span></span></span></span>
+<p><img src="/assets/images/image-4.png" alt="Spring Dimensions"></p>
+<h3 id="torque-and-force-calculations">Torque and Force Calculations</h3>
+<p>The deflection angle (\theta) during the undeployed stage is (180^\circ = \pi , \text{radians}).</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>τ</mi><mo>=</mo><mi>k</mi><mo>×</mo><mi>θ</mi><mo>=</mo><mn>15.52</mn><mo>×</mo><mi>π</mi><mo>=</mo><mn>48.75</mn><mtext> </mtext><mtext>N-mm</mtext></mrow><annotation encoding="application/x-tex">\tau = k \times \theta = 15.52 \times \pi = 48.75 \, \text{N-mm}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">15.52</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">48.75</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">N-mm</span></span></span></span></span></span>
+<p>Force generated at the center of mass (C.O.M distance = 36 mm):</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>F</mi><mtext>spring</mtext></msub><mo>=</mo><mfrac><mi>τ</mi><mtext>C.O.M distance</mtext></mfrac><mo>=</mo><mfrac><mn>48.75</mn><mn>36</mn></mfrac><mo>=</mo><mn>1.35</mn><mtext> </mtext><mtext>N</mtext></mrow><annotation encoding="application/x-tex">F_{\text{spring}} = \frac{\tau}{\text{C.O.M distance}} = \frac{48.75}{36} = 1.35 \, \text{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">spring</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">C.O.M distance</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">36</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">48.75</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1.35</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">N</span></span></span></span></span></span>
+<p>Gravitational force due to the panel weight ((19 , \text{g})):</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>F</mi><mtext>gravity</mtext></msub><mo>=</mo><mfrac><mn>19</mn><mn>1000</mn></mfrac><mo>×</mo><mn>9.81</mn><mo>=</mo><mn>0.19</mn><mtext> </mtext><mtext>N</mtext></mrow><annotation encoding="application/x-tex">F_{\text{gravity}} = \frac{19}{1000} \times 9.81 = 0.19 \, \text{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">gravity</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1000</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">19</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9.81</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">0.19</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">N</span></span></span></span></span></span>
+<p>Net upward force:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>F</mi><mtext>net</mtext></msub><mo>=</mo><msub><mi>F</mi><mtext>spring</mtext></msub><mo>−</mo><msub><mi>F</mi><mtext>gravity</mtext></msub><mo>=</mo><mn>1.35</mn><mo>−</mo><mn>0.19</mn><mo>=</mo><mn>1.16</mn><mtext> </mtext><mtext>N</mtext></mrow><annotation encoding="application/x-tex">F_{\text{net}} = F_{\text{spring}} - F_{\text{gravity}} = 1.35 - 0.19 = 1.16 \, \text{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">net</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">spring</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">gravity</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.35</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.19</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">1.16</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">N</span></span></span></span></span></span>
+<p><img src="/assets/images/image-5.png" alt="Force and Torque on panel"></p>
+<h2 id="assembly-and-testing">Assembly and Testing</h2>
+<p>The final system included:</p>
+<ol>
+<li><strong>Hinges and springs:</strong> Manufactured and tested with 3D printing.</li>
+<li><strong>Trigger mechanism:</strong> A resistor was used to heat and break the binding thread.</li>
+<li><strong>Command integration:</strong> Deployment tied to the antenna deployment system, allowing a single command to deploy both.</li>
+</ol>
+<p>The deployable system was validated through testing and ensured reliable operation within the constraints of the PocketQube satellite’s compact design.</p> </article>  </main> <footer class="site-footer" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/layouts/BaseLayout.astro" data-astro-source-loc="35:33"> <div class="shell" data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/layouts/BaseLayout.astro" data-astro-source-loc="36:26"> <p data-astro-source-file="/Users/ba974/Portfolio/myportfolio/modern/src/layouts/BaseLayout.astro" data-astro-source-loc="37:12">Research ledger and project folios by Bishal Adhikari.</p> </div> </footer> <script>
+      const toggleButton = document.getElementById("theme-toggle");
+      toggleButton?.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      });
+    </script> </body> </html>

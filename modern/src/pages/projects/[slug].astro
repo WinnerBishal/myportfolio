@@ -17,6 +17,8 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 const name = project.data.name ?? project.id;
+// Placeholder entries have no body; don't render an empty panel for them.
+const hasBody = typeof project.body === "string" && project.body.trim().length > 0;
 ---
 
 <BaseLayout title={`${name} | Bishal Adhikari`} description={project.data.description ?? "Project details"}>
@@ -28,7 +30,9 @@ const name = project.data.name ?? project.id;
 
   {project.data.report && <ReportPanel {...project.data.report} name={name} />}
 
-  <article class="content-shell">
-    <Content />
-  </article>
+  {hasBody && (
+    <article class="content-shell">
+      <Content />
+    </article>
+  )}
 </BaseLayout>

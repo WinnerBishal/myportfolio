@@ -5,15 +5,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
   return posts.map((post) => {
-    const rawSlug = post.slug ?? post.id;
-    const slugMatch = rawSlug.match(/^\d{4}-\d{2}-\d{2}-(.+)$/);
-    const dateMatch = rawSlug.match(/^(\d{4})-(\d{2})-(\d{2})-/);
+    const slugMatch = post.id.match(/^\d{4}-\d{2}-\d{2}-(.+)$/);
+    const dateMatch = post.id.match(/^(\d{4})-(\d{2})-(\d{2})-/);
     const publishedAt = dateMatch
       ? new Date(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T00:00:00Z`)
       : null;
 
     return {
-      params: { slug: slugMatch ? slugMatch[1] : rawSlug },
+      params: { slug: slugMatch ? slugMatch[1] : post.id },
       props: { post, publishedAt }
     };
   });
@@ -21,94 +20,100 @@ export async function getStaticPaths() {
 
 const { post, publishedAt } = Astro.props;
 const { Content } = await render(post);
-const title = post.data.title ?? post.data.article_title ?? post.slug ?? post.id;
+
+const title = post.data.title ?? post.data.article_title ?? post.id;
 const description = post.data.description ?? post.data.abstract ?? "Article";
 const formattedDate = publishedAt
-  ? new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(publishedAt)
+  ? // Dates are UTC midnight; formatting locally would shift them a day back.
+    new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(publishedAt)
   : null;
-const authors = post.data.authors ?? [];
+
+// Some entries still carry stub identifiers like 0000-0002-YYYY-YYYY; only link
+// out when the value is a real ORCID.
+const ORCID = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+const authors = (post.data.authors ?? []).map((author) => ({
+  name: author.name,
+  orcid: author.orcid && ORCID.test(author.orcid) ? author.orcid : undefined
+}));
+
+const tags = post.data.tags ?? [];
+const url = post.data.paper_url ?? post.data.read_more_url;
+const usable = url && !/example\.com/i.test(url) ? url : undefined;
+const link = usable
+  ? {
+      url: usable,
+      label:
+        post.data.read_more_type === "paper"
+          ? "Published version"
+          : tags.map((t) => t.toLowerCase()).includes("preprint")
+            ? "Read the preprint"
+            : "Read the full article"
+    }
+  : undefined;
+
 const hasBody = typeof post.body === "string" && post.body.trim().length > 0;
 ---
 
 <BaseLayout title={`${title} | Bishal Adhikari`} description={description}>
-  <section class="page-lead">
-    <h1>{title}</h1>
-    {formattedDate && <p class="muted-text">{formattedDate}</p>}
-    {post.data.tags && post.data.tags.length > 0 && (
-      <p>
-        {post.data.tags.map((tag) => (
-          <span class="chip">{tag}</span>
-        ))}
+  <article class="paper">
+    <header class="paper__head">
+      <a class="project-masthead__back" href="/research">Research</a>
+      <h1 class="paper__title">{title}</h1>
+
+      <p class="paper__meta">
+        {formattedDate && <time>{formattedDate}</time>}
+        {tags.length > 0 && (
+          <span class="paper__tags">
+            {tags.map((tag) => (
+              <span class="paper__tag">{tag}</span>
+            ))}
+          </span>
+        )}
       </p>
-    )}
-  </section>
 
-  <section class="article-meta-shell">
-    {post.data.abstract && (
-      <div class="article-meta-block article-meta-block--abstract">
-        <h2>Abstract</h2>
-        <p>{post.data.abstract}</p>
-      </div>
-    )}
-
-    <div class="article-meta-block">
-      <h2>Authors</h2>
-      {authors.length > 0 ? (
-        <ul class="author-list">
-          {authors.map((author) => (
-            <li class="author-list__item">
-              <p class="author-name-row">
-                <span class="author-name">{author.name}</span>
-                {author.orcid ? (
+      {authors.length > 0 && (
+        <p class="paper__authors">
+          {authors.map((author, i) => (
+            <>
+              {i > 0 && <span class="paper__sep" aria-hidden="true">·</span>}
+              <span class="paper__author">
+                {author.name}
+                {author.orcid && (
                   <a
-                    class="orcid-badge"
+                    class="paper__orcid"
                     href={`https://orcid.org/${author.orcid}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Open ORCID profile for ${author.name}`}
-                    title={`ORCID: ${author.orcid}`}
+                    title={`ORCID ${author.orcid}`}
+                    aria-label={`ORCID record for ${author.name}`}
                   >
-                    <span class="orcid-badge__icon" aria-hidden="true">iD</span>
-                    <span class="orcid-badge__text">ORCID</span>
+                    iD
                   </a>
-                ) : (
-                  <span class="orcid-badge orcid-badge--inactive">
-                    <span class="orcid-badge__icon" aria-hidden="true">iD</span>
-                    <span class="orcid-badge__text">ORCID</span>
-                  </span>
                 )}
-              </p>
-            </li>
+              </span>
+            </>
           ))}
-        </ul>
-      ) : (
-        <p class="muted-text">No author metadata is available for this article.</p>
+        </p>
       )}
-    </div>
+    </header>
 
-    <div class="article-meta-actions">
-      {post.data.read_more_type === "external" && post.data.read_more_url ? (
-        <a
-          class="button-link"
-          href={post.data.read_more_url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Read Full Article
-        </a>
-      ) : post.data.paper_url ? (
-        <a class="button-link" href={post.data.paper_url} target="_blank" rel="noopener noreferrer">
-          Open Paper
-        </a>
-      ) : (
-        <a class="button-link" href="/request.html">Request Full Article</a>
-      )}
-    </div>
-  </section>
+    {post.data.abstract && (
+      <section class="paper__abstract">
+        <h2 class="paper__label">Abstract</h2>
+        <p>{post.data.abstract}</p>
+      </section>
+    )}
 
-  {hasBody && (
-  <article class="content-shell">
-    <Content />
+    {link && (
+      <p class="paper__actions">
+        <a class="button-link" href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
+      </p>
+    )}
+
+    {hasBody && (
+      <div class="paper__body content-shell">
+        <Content />
+      </div>
+    )}
   </article>
-  )}
 </BaseLayout>
