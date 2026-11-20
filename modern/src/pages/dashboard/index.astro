@@ -85,11 +85,22 @@ import "../../styles/deer-dashboard.css";
           <p id="power-quality" class="deer-caption">No samples loaded. Missing intervals will be shown as gaps, not zero power.</p>
           <details class="deer-table-details"><summary>Power data table</summary><div class="deer-table-scroll"><table><thead><tr><th>Time (UTC)</th><th>Power (W)</th><th>Quality</th></tr></thead><tbody id="power-table"><tr><td colspan="3">No measurements</td></tr></tbody></table></div></details>
         </section>
-        <section class="deer-panel">
-          <div class="deer-panel-head"><div><p class="deer-kicker">SUPERVISOR CONTROL</p><h3>Operating schedule</h3></div></div>
+        <section class="deer-panel deer-schedule-panel" aria-labelledby="schedule-title">
+          <div class="deer-panel-head">
+            <div><p class="deer-kicker">OPERATING PLAN</p><h3 id="schedule-title">Operating schedule</h3></div>
+            <span id="schedule-kind" class="deer-schedule-kind">UTC</span>
+          </div>
+          <div class="deer-schedule-summary">
+            <div><span class="deer-schedule-label">Scheduled state</span><strong id="schedule-mode">Schedule unavailable</strong></div>
+            <div><span id="schedule-next-label" class="deer-schedule-label">Next transition</span><strong id="schedule-next">—</strong><span id="schedule-next-at" class="deer-schedule-secondary">Awaiting a schedule</span></div>
+          </div>
+          <div id="schedule-strip" class="deer-schedule-timeline"><p class="deer-schedule-empty">Connect to the node to retrieve its operating plan.</p></div>
+          <ol id="schedule-windows" class="deer-schedule-windows" aria-label="Scheduled active and sleep periods"></ol>
           <p id="schedule-banner" class="deer-schedule-banner">No verified schedule available</p>
-          <div id="schedule-strip" class="deer-schedule-strip"><span>Schedule pending</span></div>
-          <dl class="deer-details"><div><dt>Predicted mode</dt><dd id="schedule-mode">UNKNOWN</dd></div><div><dt>Schedule version</dt><dd id="schedule-version">—</dd></div><div><dt>Last verified</dt><dd id="schedule-verified">—</dd></div><div><dt>Provenance</dt><dd id="schedule-source">—</dd></div></dl>
+          <details class="deer-schedule-details">
+            <summary>Schedule details</summary>
+            <dl class="deer-details"><div><dt>Schedule version</dt><dd id="schedule-version">—</dd></div><div><dt>Last verified</dt><dd id="schedule-verified">—</dd></div><div><dt>Provenance</dt><dd id="schedule-source">—</dd></div></dl>
+          </details>
         </section>
         <section class="deer-panel">
           <div class="deer-panel-head"><div><p class="deer-kicker">VISUAL PERCEPTION</p><h3>Vision telemetry</h3></div></div>

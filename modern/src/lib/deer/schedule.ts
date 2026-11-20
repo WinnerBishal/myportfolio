@@ -133,3 +133,27 @@ export function utc(value: string | number | null | undefined) {
   const date = new Date(value);
   return Number.isFinite(date.getTime()) ? date.toISOString().replace('T', ' ').slice(0, 19) + ' UTC' : '—';
 }
+
+export function scheduleTimeline(schedule: Schedule | null, now = Date.now()) {
+  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) return null;
+  const bench = schedule.mode === 'BENCH_ONE_SHOT';
+  const start = bench ? schedule.esp_boot_epoch_utc! * 1000 : dayStart(now);
+  const end = bench ? start + schedule.end_at_ms! : start + DAY;
+  const effective = !bench && schedule.effective_from_utc ? Date.parse(schedule.effective_from_utc) : start;
+  const windows = bench
+    ? [{ start, end: start + schedule.shutdown_at_ms! }, { start: start + schedule.wake_at_ms!, end }]
+    : occurrences(schedule, now);
+  const active = windows.map((window) => ({
+    start: Math.max(start, effective, window.start),
+    end: Math.min(end, window.end)
+  })).filter((window) => window.end > window.start);
+  const segments: { start: number; end: number; active: boolean }[] = [];
+  let cursor = start;
+  for (const window of active) {
+    if (window.start > cursor) segments.push({ start: cursor, end: window.start, active: false });
+    segments.push({ ...window, active: true });
+    cursor = window.end;
+  }
+  if (cursor < end) segments.push({ start: cursor, end, active: false });
+  return { start, end, bench, segments };
+}

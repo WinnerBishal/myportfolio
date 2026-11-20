@@ -1,4 +1,4 @@
-import { duration, isValidSchedule, predict, scheduleVersion, utc, type Schedule } from './schedule';
+import { duration, isValidSchedule, predict, scheduleTimeline, scheduleVersion, utc, type Schedule } from './schedule';
 
 type RecordData = Record<string, any>;
 type EventData = RecordData & { event_id?: string; observed_at_utc?: string; timestamp_utc?: string; type?: string; event_type?: string };
@@ -225,52 +225,96 @@ function info() {
 }
 function drawSchedule() {
   const el = $('schedule-strip');
+  const list = $('schedule-windows');
   el.replaceChildren();
-  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) {
-    el.textContent = 'No active UTC windows available';
+  list.replaceChildren();
+  const now = Date.now();
+  const timeline = scheduleTimeline(schedule, now);
+  const prediction = predict(schedule, now);
+  const states = {
+    SCHEDULED_ACTIVE: 'Active window',
+    SCHEDULED_SLEEP: 'Sleep window',
+    BOOT_GRACE: 'Wake-up grace period',
+    BENCH_COMPLETE: 'Bench cycle complete',
+    UNKNOWN_SCHEDULE: 'Schedule unavailable'
+  };
+  set('schedule-mode', schedule?.enabled === false ? 'Schedule disabled' : states[prediction.state]);
+  set('schedule-kind', timeline?.bench ? 'ONE-SHOT BENCH' : 'UTC');
+  set('schedule-next-label', prediction.nextAction === 'wake' ? 'Next wake' : prediction.nextAction === 'shutdown' ? 'Next shutdown' : 'Next transition');
+  set('schedule-next', prediction.nextAt ? 'In ' + duration((prediction.nextAt - now) / 1000) : '—');
+  set('schedule-next-at', prediction.nextAt ? utc(prediction.nextAt) : prediction.state === 'BENCH_COMPLETE' ? 'No further transitions in this cycle' : 'No transition available');
+  if (!timeline) {
+    const empty = document.createElement('p');
+    empty.className = 'deer-schedule-empty';
+    empty.textContent = schedule?.enabled === false
+      ? 'No operating windows are enabled.'
+      : 'Connect to the node to retrieve its operating plan.';
+    el.append(empty);
     return;
   }
-  const bench = schedule.mode === 'BENCH_ONE_SHOT';
-  const boot = bench ? schedule.esp_boot_epoch_utc! * 1000 : 0;
-  const today = new Date();
-  const midnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const startOfView = bench ? boot : midnight;
-  const endOfView = bench ? boot + schedule.end_at_ms! : midnight + 86400000;
-  const addSlot = (start: number, end: number) => {
-    const left = Math.max(start, startOfView), right = Math.min(end, endOfView);
-    if (right <= left) return;
-    const slot = document.createElement('span');
-    slot.className = 'slot';
-    slot.style.left = `${((left - startOfView) / (endOfView - startOfView)) * 100}%`;
-    slot.style.width = `${((right - left) / (endOfView - startOfView)) * 100}%`;
-    el.append(slot);
-  };
-  if (bench) {
-    addSlot(boot, boot + schedule.shutdown_at_ms!);
-    addSlot(boot + schedule.wake_at_ms!, boot + schedule.end_at_ms!);
-  } else {
-    const windows = schedule.windows ?? schedule.daily_windows ?? [];
-    for (const offset of [-1, 0]) {
-      for (const win of windows) {
-        const start = (win.start_utc ?? win.start ?? '00:00').split(':').map(Number);
-        const end = (win.end_utc ?? win.end ?? '00:00').split(':').map(Number);
-        const a = midnight + offset * 86400000 + (start[0] * 60 + start[1]) * 60000;
-        const b = midnight + offset * 86400000 + (end[0] * 60 + end[1]) * 60000 + ((end[0] * 60 + end[1]) < (start[0] * 60 + start[1]) ? 86400000 : 0);
-        addSlot(a, b);
-      }
-    }
-  }
-  const fraction = (Date.now() - startOfView) / (endOfView - startOfView);
-  if (fraction >= 0 && fraction <= 1) {
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    cursor.style.left = `${fraction * 100}%`;
-    el.append(cursor);
-  }
-  const caption = document.createElement('span');
-  caption.className = 'slot-label';
-  caption.textContent = bench ? `BENCH ONE-SHOT · ${utc(boot)} to ${utc(endOfView)}` : '00:00 — 24:00 UTC';
+  const { start, end, bench, segments } = timeline;
+  const clock = (time: number) => time === end && !bench ? '24:00' : new Date(time).toISOString().slice(11, 19);
+  const caption = document.createElement('p');
+  caption.className = 'deer-schedule-caption';
+  caption.textContent = bench
+    ? 'One-time cycle · ' + utc(start)
+    : new Date(start).toISOString().slice(0, 10) + ' · All times UTC';
   el.append(caption);
+  const track = document.createElement('div');
+  track.className = 'deer-schedule-track';
+  track.setAttribute('aria-hidden', 'true');
+  for (const segment of segments) {
+    const slot = document.createElement('span');
+    slot.className = 'deer-schedule-slot ' + (segment.active ? 'is-active' : 'is-sleep');
+    slot.style.left = ((segment.start - start) / (end - start) * 100) + '%';
+    slot.style.width = ((segment.end - segment.start) / (end - start) * 100) + '%';
+    slot.title = (segment.active ? 'Active' : 'Sleep') + ' · ' + clock(segment.start) + '–' + clock(segment.end) + ' UTC';
+    if ((segment.end - segment.start) / (end - start) >= 0.16) slot.textContent = segment.active ? 'Active' : 'Sleep';
+    track.append(slot);
+    const row = document.createElement('li');
+    row.className = segment.active ? 'is-active' : 'is-sleep';
+    const current = now >= segment.start && now < segment.end;
+    if (current) row.setAttribute('aria-current', 'time');
+    const state = document.createElement('span');
+    state.className = 'deer-schedule-window-state';
+    state.textContent = (segment.active ? 'Active' : 'Sleep') + (current ? ' · Now' : '');
+    const times = document.createElement('span');
+    times.className = 'deer-schedule-window-time';
+    times.textContent = clock(segment.start) + ' – ' + clock(segment.end) + ' UTC';
+    const length = document.createElement('span');
+    length.className = 'deer-schedule-window-duration';
+    length.textContent = duration((segment.end - segment.start) / 1000);
+    row.append(state, times, length);
+    list.append(row);
+  }
+  const fraction = (now - start) / (end - start);
+  if (fraction >= 0 && fraction < 1) {
+    const marker = document.createElement('span');
+    marker.className = 'deer-schedule-now' + (fraction < 0.1 ? ' at-start' : fraction > 0.9 ? ' at-end' : '');
+    marker.style.left = (fraction * 100) + '%';
+    const label = document.createElement('span');
+    label.textContent = 'Now';
+    marker.append(label);
+    track.append(marker);
+  }
+  el.append(track);
+  const axis = document.createElement('div');
+  axis.className = 'deer-schedule-axis';
+  axis.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i <= 4; i++) {
+    const tick = document.createElement('span');
+    tick.textContent = bench ? duration((end - start) * i / 4000) : String(i * 6).padStart(2, '0') + ':00';
+    axis.append(tick);
+  }
+  el.append(axis);
+  if (bench) {
+    const note = document.createElement('p');
+    note.className = 'deer-schedule-caption';
+    note.textContent = prediction.state === 'BENCH_COMPLETE'
+      ? 'Cycle ended ' + utc(end) + '. This plan does not repeat.'
+      : 'Elapsed time from ESP boot · This plan does not repeat.';
+    el.append(note);
+  }
 }
 function drawPower() {
   const el = $('power-plot');
