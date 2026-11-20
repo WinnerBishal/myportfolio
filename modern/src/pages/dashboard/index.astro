@@ -1,0 +1,124 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import "../../styles/deer-dashboard.css";
+---
+
+<BaseLayout title="Deer Network | Station" description="Autonomous field-node operations and telemetry dashboard">
+  <div class="deer" id="deer-dashboard">
+    <header class="deer-top">
+      <div>
+        <p class="deer-eyebrow"><span class="deer-led"></span> FIELD OPERATIONS / NETWORK 01</p>
+        <h1>Deer <span>Network</span></h1>
+        <p class="deer-subtitle">Autonomous sensing infrastructure <span aria-hidden="true">·</span> Fleet mission control</p>
+      </div>
+      <div class="deer-top-side">
+        <div id="utc-clock" class="deer-clock" aria-label="Current UTC time">— UTC</div>
+        <div id="global-connection" class="deer-indicator">NOT CONNECTED</div>
+      </div>
+    </header>
+
+    <div class="deer-toolbar" role="group" aria-label="Dashboard controls">
+      <div class="deer-tabs" aria-label="Dashboard sections">
+        <button data-view="fleet" class="is-active" aria-pressed="true">Fleet overview</button>
+        <button data-view="node" aria-pressed="false">Node diagnostics</button>
+      </div>
+      <div class="deer-actions">
+        <span id="data-mode" class="deer-data-mode">NO LIVE DATA</span>
+        <button id="demo-toggle" type="button">Enable demo</button>
+        <button id="settings-open" type="button" aria-haspopup="dialog">Configure endpoint <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+
+    <section id="notification" class="deer-notice" role="status" aria-live="polite">
+      <strong>Private node unreachable.</strong> Connect to Tailscale for live telemetry. Schedule predictions are shown only when a verified or published schedule is available.
+    </section>
+
+    <section class="deer-view" id="fleet-view" aria-label="Fleet overview">
+      <div class="deer-section-heading">
+        <div><p class="deer-kicker">NETWORK STATUS</p><h2>Fleet overview</h2></div>
+        <span class="deer-hint">01 registered node</span>
+      </div>
+      <div class="deer-summary">
+        <article><span>Registered nodes</span><strong>01</strong><small>Fleet capacity expandable</small></article>
+        <article><span>Connected</span><strong id="fleet-online">00</strong><small>Confirmed browser reachability</small></article>
+        <article><span>Expected active</span><strong id="fleet-active">—</strong><small>UTC schedule prediction</small></article>
+        <article><span>Last measurement</span><strong id="fleet-last">—</strong><small>Not necessarily current</small></article>
+      </div>
+      <button class="deer-node-card" id="node-open" type="button">
+        <div class="deer-node-card-top">
+          <div class="deer-node-identity"><span class="deer-node-icon">01</span><div><strong>node-01</strong><small>Autonomous field camera / Jetson Orin Nano</small></div></div>
+          <span class="deer-pill" id="fleet-state">OFFLINE / UNKNOWN</span>
+        </div>
+        <div class="deer-node-card-middle">
+          <div><span>Observed state</span><strong id="fleet-observed">UNKNOWN</strong></div>
+          <div><span>Scheduled state</span><strong id="fleet-expected">UNKNOWN SCHEDULE</strong></div>
+          <div><span>Input power</span><strong id="fleet-power">— W</strong></div>
+          <div><span>Next transition</span><strong id="fleet-next">—</strong></div>
+        </div>
+        <div class="deer-node-card-bottom"><span id="fleet-seen">No confirmed contact</span><span>Open diagnostics →</span></div>
+      </button>
+    </section>
+
+    <section class="deer-view" id="node-view" aria-label="Node diagnostics" hidden>
+      <div class="deer-node-header">
+        <div><p class="deer-kicker">FIELD NODE / 001</p><h2>node-01 <span id="node-status" class="deer-pill">OFFLINE / UNKNOWN</span></h2><p id="node-seen" class="deer-hint">No confirmed contact</p></div>
+        <div class="deer-next"><small>NEXT SCHEDULED TRANSITION</small><strong id="countdown">—</strong><span id="transition-utc">Awaiting schedule</span></div>
+      </div>
+
+      <div class="deer-metrics">
+        <article><span>Bus voltage</span><strong id="metric-voltage">— <small>V</small></strong><small id="metric-voltage-info">No measurement</small></article>
+        <article><span>Bus current</span><strong id="metric-current">— <small>A</small></strong><small>INA260 / total bus</small></article>
+        <article><span>Bus power</span><strong id="metric-power">— <small>W</small></strong><small id="metric-power-info">No measurement</small></article>
+        <article><span>Vision inference</span><strong id="metric-fps">— <small>FPS</small></strong><small id="metric-vision-info">No measurement</small></article>
+      </div>
+
+      <div class="deer-panels">
+        <section class="deer-panel deer-panel-wide">
+          <div class="deer-panel-head"><div><p class="deer-kicker">ENERGY TELEMETRY</p><h3>Power consumption</h3></div>
+            <div class="deer-range" role="group" aria-label="Power history range">
+              <button data-range="1" aria-pressed="true">1H</button><button data-range="6" aria-pressed="false">6H</button><button data-range="24" aria-pressed="false">24H</button><button data-range="168" aria-pressed="false">7D</button>
+            </div>
+          </div>
+          <div class="deer-plot" id="power-plot" role="img" aria-label="Power history; missing intervals remain disconnected">
+            <div class="deer-plot-empty">Historical power measurements unavailable.</div>
+          </div>
+          <p id="power-quality" class="deer-caption">No samples loaded. Missing intervals will be shown as gaps, not zero power.</p>
+          <details class="deer-table-details"><summary>Power data table</summary><div class="deer-table-scroll"><table><thead><tr><th>Time (UTC)</th><th>Power (W)</th><th>Quality</th></tr></thead><tbody id="power-table"><tr><td colspan="3">No measurements</td></tr></tbody></table></div></details>
+        </section>
+        <section class="deer-panel">
+          <div class="deer-panel-head"><div><p class="deer-kicker">SUPERVISOR CONTROL</p><h3>Operating schedule</h3></div></div>
+          <p id="schedule-banner" class="deer-schedule-banner">No verified schedule available</p>
+          <div id="schedule-strip" class="deer-schedule-strip"><span>Schedule pending</span></div>
+          <dl class="deer-details"><div><dt>Predicted mode</dt><dd id="schedule-mode">UNKNOWN</dd></div><div><dt>Schedule version</dt><dd id="schedule-version">—</dd></div><div><dt>Last verified</dt><dd id="schedule-verified">—</dd></div><div><dt>Provenance</dt><dd id="schedule-source">—</dd></div></dl>
+        </section>
+        <section class="deer-panel">
+          <div class="deer-panel-head"><div><p class="deer-kicker">VISUAL PERCEPTION</p><h3>Vision telemetry</h3></div></div>
+          <div class="deer-vision-highlight"><strong id="vision-count">—</strong><span>Latest detection count<br><small>Not unique animals</small></span></div>
+          <dl class="deer-details"><div><dt>Session detections</dt><dd id="vision-total">—</dd></div><div><dt>Inference latency</dt><dd id="vision-latency">—</dd></div><div><dt>Camera</dt><dd id="vision-camera">UNKNOWN</dd></div><div><dt>Recording</dt><dd id="vision-recording">UNKNOWN</dd></div></dl>
+        </section>
+        <section class="deer-panel deer-panel-wide">
+          <div class="deer-panel-head"><div><p class="deer-kicker">OPERATIONAL HISTORY</p><h3>Event timeline</h3></div><span id="events-meta" class="deer-hint">No events</span></div>
+          <ol id="event-timeline" class="deer-events"><li class="deer-empty">Connect to the node to retrieve events.</li></ol>
+        </section>
+        <section class="deer-panel">
+          <div class="deer-panel-head"><div><p class="deer-kicker">SYSTEM HEALTH</p><h3>Diagnostics</h3></div></div>
+          <dl class="deer-details"><div><dt>API reachability</dt><dd id="diag-api">OFFLINE</dd></div><div><dt>Manager state</dt><dd id="diag-manager">UNKNOWN</dd></div><div><dt>ESP session</dt><dd id="diag-session">—</dd></div><div><dt>Time quality</dt><dd id="diag-trust">UNKNOWN</dd></div><div><dt>Services</dt><dd id="diag-services">—</dd></div><div><dt>Last fault</dt><dd id="diag-fault">—</dd></div></dl>
+        </section>
+      </div>
+    </section>
+
+    <footer class="deer-foot"><span>DEER NETWORK <span aria-hidden="true">/</span> TELEMETRY v1</span><span id="data-foot">UTC · Read-only · No remote controls</span></footer>
+  </div>
+
+  <dialog class="deer-dialog" id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" id="settings-form">
+      <div class="deer-dialog-head"><div><p class="deer-kicker">NODE SETTINGS</p><h2 id="settings-title">Telemetry connection</h2></div><button type="submit" value="cancel" aria-label="Close settings">✕</button></div>
+      <p>Enter the private Tailscale Serve HTTPS endpoint for node-01. The address stays in this browser and is never embedded in the published website.</p>
+      <label for="endpoint-input">API base URL</label>
+      <input id="endpoint-input" type="url" placeholder="https://node-01.example.ts.net/api/v1" autocomplete="off" spellcheck="false" />
+      <p id="endpoint-error" class="deer-error" aria-live="polite"></p>
+      <div class="deer-dialog-actions"><button type="button" id="endpoint-clear">Clear endpoint</button><button type="button" id="endpoint-save">Save & connect</button></div>
+    </form>
+  </dialog>
+  <script>import "../../lib/deer/dashboard";</script>
+</BaseLayout>
