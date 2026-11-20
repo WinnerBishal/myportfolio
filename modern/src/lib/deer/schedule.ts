@@ -5,6 +5,13 @@ export type Schedule = {
   version?: string | null;
   schedule_version?: string | null;
   timezone?: string;
+  mode?: string;
+  daily_schedule_enabled?: boolean;
+  esp_boot_epoch_utc?: number;
+  shutdown_at_ms?: number;
+  wake_at_ms?: number;
+  end_at_ms?: number;
+  bootstrap_deadline_ms?: number;
   enabled?: boolean;
   effective_from_utc?: string;
   boot_grace_s?: number;
@@ -18,7 +25,7 @@ export type Schedule = {
   stale?: boolean;
 };
 export type Prediction = {
-  state: 'SCHEDULED_ACTIVE' | 'SCHEDULED_SLEEP' | 'BOOT_GRACE' | 'UNKNOWN_SCHEDULE';
+  state: 'SCHEDULED_ACTIVE' | 'SCHEDULED_SLEEP' | 'BOOT_GRACE' | 'BENCH_COMPLETE' | 'UNKNOWN_SCHEDULE';
   nextAt: number | null;
   nextAction: 'wake' | 'shutdown' | null;
   activeStart: number | null;
@@ -71,6 +78,13 @@ export function isValidSchedule(value: unknown): value is Schedule {
   if (s.timezone !== 'UTC' || typeof s.enabled !== 'boolean' || !scheduleVersion(s)) return false;
   const windows = s.windows ?? s.daily_windows;
   if (!Array.isArray(windows)) return false;
+  if (s.mode === 'BENCH_ONE_SHOT') {
+    return Number.isSafeInteger(s.esp_boot_epoch_utc) && s.esp_boot_epoch_utc! > 0
+      && Number.isSafeInteger(s.shutdown_at_ms) && Number.isSafeInteger(s.wake_at_ms)
+      && Number.isSafeInteger(s.end_at_ms)
+      && s.shutdown_at_ms! > 0 && s.shutdown_at_ms! < s.wake_at_ms!
+      && s.wake_at_ms! < s.end_at_ms!;
+  }
   if (s.enabled && windows.length === 0) return false;
   if (s.boot_grace_s !== undefined && (!Number.isFinite(s.boot_grace_s) || s.boot_grace_s < 0)) return false;
   if (s.effective_from_utc && !Number.isFinite(Date.parse(s.effective_from_utc))) return false;
@@ -79,6 +93,17 @@ export function isValidSchedule(value: unknown): value is Schedule {
 export function predict(schedule: Schedule | null, now = Date.now()): Prediction {
   const unknown: Prediction = { state: 'UNKNOWN_SCHEDULE', nextAt: null, nextAction: null, activeStart: null, graceUntil: null };
   if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) return unknown;
+  if (schedule.mode === 'BENCH_ONE_SHOT') {
+    const boot = schedule.esp_boot_epoch_utc! * 1000;
+    const shutdown = boot + schedule.shutdown_at_ms!;
+    const wake = boot + schedule.wake_at_ms!;
+    const end = boot + schedule.end_at_ms!;
+    if (now < boot) return unknown;
+    if (now < shutdown) return { state: 'SCHEDULED_ACTIVE', nextAt: shutdown, nextAction: 'shutdown', activeStart: boot, graceUntil: null };
+    if (now < wake) return { state: 'SCHEDULED_SLEEP', nextAt: wake, nextAction: 'wake', activeStart: null, graceUntil: null };
+    if (now < end) return { state: 'SCHEDULED_ACTIVE', nextAt: end, nextAction: 'shutdown', activeStart: wake, graceUntil: null };
+    return { state: 'BENCH_COMPLETE', nextAt: null, nextAction: null, activeStart: null, graceUntil: null };
+  }
   const effective = schedule.effective_from_utc ? Date.parse(schedule.effective_from_utc) : -Infinity;
   if (now < effective) return unknown;
   const intervals = occurrences(schedule, now).filter((w) => w.end > effective);
