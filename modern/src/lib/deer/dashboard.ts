@@ -140,6 +140,7 @@ function liveState() {
   }
   if (observed === 'DEGRADED') return { observed, label: 'DEGRADED / CONFIRMED', expected: predicted.state };
   if (predicted.state === 'SCHEDULED_SLEEP') return { observed, label: 'UNSCHEDULED ACTIVE', expected: predicted.state };
+  if (predicted.state === 'BENCH_COMPLETE') return { observed, label: 'BENCH COMPLETE / CONNECTED', expected: predicted.state };
   if (observed === 'WAITING_FOR_TIME') return { observed, label: 'WAITING FOR TIME / CONFIRMED', expected: predicted.state };
   if (isTimeFresh(parseTime(status?.observed_at_utc))) return { observed, label: 'ACTIVE / CONFIRMED', expected: predicted.state };
   return { observed, label: 'CONNECTED / STATUS STALE', expected: predicted.state };
@@ -159,7 +160,7 @@ function info() {
   const vision = status?.vision ?? {};
   const powerTime = parseTime(status?.power?.sampled_at_utc);
   const powerFresh = demo || isTimeFresh(powerTime);
-  const visionTime = parseTime(field(vision.sampled_at_utc, vision.observed_at_utc));
+  const visionTime = parseTime(field(vision.sampled_at_utc, vision.observed_at_utc, vision.frame_utc));
   const visionFresh = demo || isTimeFresh(visionTime);
   const rtcTrusted = status?.esp?.rtc_trusted === true;
   const voltage = powerFresh ? rawVoltage : null;
@@ -188,12 +189,13 @@ function info() {
   set('metric-voltage-info', powerFreshness);
   set('metric-power-info', powerFreshness);
   set('metric-vision-info', demo ? 'SIMULATED · DEMO' : visionFresh ? 'FRESH · MEASURED' : vision.pipeline_ready === true ? 'PIPELINE READY · NO FPS SAMPLE' : 'No measurement');
-  const latestCount = visionFresh ? field(vision.latest_deer_count, vision.deer_count, vision.track_count, vision.latest_detection_count) : null;
+  const latestCount = visionFresh ? field(vision.latest_deer_count, vision.deer_count, vision.detection_count, vision.track_count, vision.latest_detection_count) : null;
   set('vision-count', latestCount === null || latestCount === undefined ? '—' : String(latestCount));
   set('vision-total', visionFresh ? String(field(vision.session_detection_count, vision.total_detections, '—')) : '—');
-  set('vision-latency', visionFresh ? number(field(vision.inference_latency_ms, vision.latency_ms)) + ' ms' : '—');
+  set('vision-latency', visionFresh ? number(field(vision.inference_latency_ms, vision.inference_ms, vision.latency_ms)) + ' ms' : '—');
   set('vision-camera', demo ? 'READY' : online && vision.pipeline_ready === true ? 'PIPELINE READY' : visionFresh ? String(field(vision.camera_state, vision.camera_status, 'UNKNOWN')) : 'UNKNOWN');
-  set('vision-recording', visionFresh ? String(field(vision.recording_state, vision.recording, 'UNKNOWN')) : 'UNKNOWN');
+  const recording = field(vision.recording_state, vision.recording_enabled, vision.recording);
+  set('vision-recording', visionFresh && recording !== undefined ? typeof recording === 'boolean' ? recording ? 'ON' : 'OFF' : String(recording) : 'UNKNOWN');
   set('diag-manager', observed);
   set('diag-api', demo ? 'DEMO' : online ? 'ONLINE' : 'OFFLINE');
   set('diag-session', String(field(status?.esp?.session_id, status?.esp_session_id, metadata?.esp_session_id, '—')));
