@@ -118,11 +118,15 @@ function normalizeEvents(raw: RecordData): EventData[] {
   return items.filter((item: unknown) => item && typeof item === 'object').slice(-200);
 }
 function measuredAt(s: RecordData | null) {
-  return parseTime(field(s?.observed_at_utc, s?.power?.sampled_at_utc, s?.timestamp_utc));
+  const times = [s?.observed_at_utc, s?.power?.sampled_at_utc, s?.vision?.sampled_at_utc, s?.timestamp_utc]
+    .map(parseTime).filter((t): t is number => t !== null);
+  return times.length ? Math.max(...times) : null;
+}
+function isTimeFresh(time: number | null, maxAge = 30000) {
+  return online && time !== null && Date.now() - time >= -30000 && Date.now() - time <= maxAge;
 }
 function isFresh(s: RecordData | null) {
-  const t = measuredAt(s);
-  return online && t !== null && Date.now() - t >= -30000 && Date.now() - t <= 30000;
+  return isTimeFresh(measuredAt(s));
 }
 function liveState() {
   const observed = clean(field(status?.observed_state, status?.manager?.state, status?.manager_state)) || 'UNKNOWN';
@@ -136,7 +140,8 @@ function liveState() {
   }
   if (observed === 'DEGRADED') return { observed, label: 'DEGRADED / CONFIRMED', expected: predicted.state };
   if (predicted.state === 'SCHEDULED_SLEEP') return { observed, label: 'UNSCHEDULED ACTIVE', expected: predicted.state };
-  if (isFresh(status)) return { observed, label: 'ACTIVE / CONFIRMED', expected: predicted.state };
+  if (observed === 'WAITING_FOR_TIME') return { observed, label: 'WAITING FOR TIME / CONFIRMED', expected: predicted.state };
+  if (isTimeFresh(parseTime(status?.observed_at_utc))) return { observed, label: 'ACTIVE / CONFIRMED', expected: predicted.state };
   return { observed, label: 'CONNECTED / STATUS STALE', expected: predicted.state };
 }
 function setPill(id: string, label: string) {
@@ -152,11 +157,15 @@ function info() {
   const rawVoltage = field(status?.power?.voltage_v, status?.voltage_v, status?.sensors?.voltage_v);
   const rawCurrent = field(status?.power?.current_a, status?.current_a, status?.sensors?.current_a);
   const vision = status?.vision ?? {};
-  const fresh = demo || isFresh(status);
-  const voltage = fresh ? rawVoltage : null;
-  const current = fresh ? rawCurrent : null;
-  const watts = fresh ? rawPower : null;
-  const fps = fresh ? field(vision.fps, vision.camera_fps) : null;
+  const powerTime = parseTime(status?.power?.sampled_at_utc);
+  const powerFresh = demo || isTimeFresh(powerTime);
+  const visionTime = parseTime(field(vision.sampled_at_utc, vision.observed_at_utc));
+  const visionFresh = demo || isTimeFresh(visionTime);
+  const rtcTrusted = status?.esp?.rtc_trusted === true;
+  const voltage = powerFresh ? rawVoltage : null;
+  const current = powerFresh ? rawCurrent : null;
+  const watts = powerFresh ? rawPower : null;
+  const fps = visionFresh ? field(vision.fps, vision.camera_fps) : null;
   const observed = state.observed;
   const seen = measuredAt(status);
   const seenText = seen !== null ? ageText(seen) : 'No confirmed contact';
@@ -175,20 +184,20 @@ function info() {
   set('metric-current', number(current, 2) + ' A');
   set('metric-power', number(watts, 2) + ' W');
   set('metric-fps', number(fps) + ' FPS');
-  const freshness = demo ? 'SIMULATED · DEMO' : fresh ? 'FRESH · MEASURED' : seen ? 'STALE · LAST KNOWN' : 'No measurement';
-  set('metric-voltage-info', freshness);
-  set('metric-power-info', freshness);
-  set('metric-vision-info', freshness);
-  const latestCount = fresh ? field(vision.latest_deer_count, vision.deer_count, vision.track_count, vision.latest_detection_count) : null;
+  const powerFreshness = demo ? 'SIMULATED · DEMO' : powerFresh ? (rtcTrusted ? 'FRESH · MEASURED' : 'MEASURED · RTC UNTRUSTED') : powerTime ? 'STALE · LAST KNOWN' : 'No measurement';
+  set('metric-voltage-info', powerFreshness);
+  set('metric-power-info', powerFreshness);
+  set('metric-vision-info', demo ? 'SIMULATED · DEMO' : visionFresh ? 'FRESH · MEASURED' : vision.pipeline_ready === true ? 'PIPELINE READY · NO FPS SAMPLE' : 'No measurement');
+  const latestCount = visionFresh ? field(vision.latest_deer_count, vision.deer_count, vision.track_count, vision.latest_detection_count) : null;
   set('vision-count', latestCount === null || latestCount === undefined ? '—' : String(latestCount));
-  set('vision-total', fresh ? String(field(vision.session_detection_count, vision.total_detections, '—')) : '—');
-  set('vision-latency', fresh ? number(field(vision.inference_latency_ms, vision.latency_ms)) + ' ms' : '—');
-  set('vision-camera', fresh ? String(field(vision.camera_state, vision.camera_status, 'UNKNOWN')) : 'UNKNOWN');
-  set('vision-recording', fresh ? String(field(vision.recording_state, vision.recording, 'UNKNOWN')) : 'UNKNOWN');
+  set('vision-total', visionFresh ? String(field(vision.session_detection_count, vision.total_detections, '—')) : '—');
+  set('vision-latency', visionFresh ? number(field(vision.inference_latency_ms, vision.latency_ms)) + ' ms' : '—');
+  set('vision-camera', demo ? 'READY' : online && vision.pipeline_ready === true ? 'PIPELINE READY' : visionFresh ? String(field(vision.camera_state, vision.camera_status, 'UNKNOWN')) : 'UNKNOWN');
+  set('vision-recording', visionFresh ? String(field(vision.recording_state, vision.recording, 'UNKNOWN')) : 'UNKNOWN');
   set('diag-manager', observed);
   set('diag-api', demo ? 'DEMO' : online ? 'ONLINE' : 'OFFLINE');
   set('diag-session', String(field(status?.esp?.session_id, status?.esp_session_id, metadata?.esp_session_id, '—')));
-  set('diag-trust', String(field(status?.time?.quality, status?.time_quality, status?.esp?.time_trusted === true ? 'TRUSTED' : null, 'UNKNOWN')));
+  set('diag-trust', String(field(status?.time?.quality, status?.time_quality, status?.esp?.rtc_trusted === true ? 'TRUSTED' : status?.esp?.rtc_trusted === false ? 'UNTRUSTED' : null, 'UNKNOWN')));
   set('diag-services', status?.services && typeof status.services === 'object' ? Object.entries(status.services).map(([name, v]) => name + ':' + (typeof v === 'string' ? v : (v as RecordData)?.state ?? '?')).join(' · ') : '—');
   set('diag-fault', String(field(status?.last_fault?.message, status?.last_fault, '—')));
   set('schedule-mode', pred.state.replace(/_/g, ' '));
@@ -279,11 +288,11 @@ function drawEvents() {
   const el = $('event-timeline'); el.replaceChildren();
   const ordered = [...events].sort((a, b) => {
     if (a.time_trusted === false || b.time_trusted === false) return 0;
-    return (parseTime(field(b.observed_at_utc, b.timestamp_utc, b.time_utc)) ?? 0) - (parseTime(field(a.observed_at_utc, a.timestamp_utc, a.time_utc)) ?? 0);
+    return (parseTime(field(b.occurred_at_utc, b.observed_at_utc, b.timestamp_utc, b.time_utc)) ?? 0) - (parseTime(field(a.occurred_at_utc, a.observed_at_utc, a.timestamp_utc, a.time_utc)) ?? 0);
   });
   for (const e of ordered.slice(0, 60)) {
     const item = document.createElement('li');
-    const time = document.createElement('time'); time.textContent = utc(field(e.observed_at_utc, e.timestamp_utc, e.time_utc) as string);
+    const time = document.createElement('time'); time.textContent = e.time_trusted === false ? 'TIME UNTRUSTED' : utc(field(e.occurred_at_utc, e.observed_at_utc, e.timestamp_utc, e.time_utc) as string);
     const content = document.createElement('div');
     const title = document.createElement('strong'); title.textContent = clean(field(e.event_type, e.type, e.code, 'EVENT'));
     const desc = document.createElement('small'); desc.textContent = clean(field(e.message, e.description, e.source, ''));
