@@ -140,6 +140,7 @@ function liveState() {
   }
   if (observed === 'DEGRADED') return { observed, label: 'DEGRADED / CONFIRMED', expected: predicted.state };
   if (predicted.state === 'SCHEDULED_SLEEP') return { observed, label: 'UNSCHEDULED ACTIVE', expected: predicted.state };
+  if (predicted.state === 'BENCH_COMPLETE') return { observed, label: 'BENCH COMPLETE / CONNECTED', expected: predicted.state };
   if (observed === 'WAITING_FOR_TIME') return { observed, label: 'WAITING FOR TIME / CONFIRMED', expected: predicted.state };
   if (isTimeFresh(parseTime(status?.observed_at_utc))) return { observed, label: 'ACTIVE / CONFIRMED', expected: predicted.state };
   return { observed, label: 'CONNECTED / STATUS STALE', expected: predicted.state };
@@ -159,7 +160,7 @@ function info() {
   const vision = status?.vision ?? {};
   const powerTime = parseTime(status?.power?.sampled_at_utc);
   const powerFresh = demo || isTimeFresh(powerTime);
-  const visionTime = parseTime(field(vision.sampled_at_utc, vision.observed_at_utc));
+  const visionTime = parseTime(field(vision.sampled_at_utc, vision.observed_at_utc, vision.frame_utc));
   const visionFresh = demo || isTimeFresh(visionTime);
   const rtcTrusted = status?.esp?.rtc_trusted === true;
   const voltage = powerFresh ? rawVoltage : null;
@@ -188,12 +189,13 @@ function info() {
   set('metric-voltage-info', powerFreshness);
   set('metric-power-info', powerFreshness);
   set('metric-vision-info', demo ? 'SIMULATED · DEMO' : visionFresh ? 'FRESH · MEASURED' : vision.pipeline_ready === true ? 'PIPELINE READY · NO FPS SAMPLE' : 'No measurement');
-  const latestCount = visionFresh ? field(vision.latest_deer_count, vision.deer_count, vision.track_count, vision.latest_detection_count) : null;
+  const latestCount = visionFresh ? field(vision.latest_deer_count, vision.deer_count, vision.detection_count, vision.track_count, vision.latest_detection_count) : null;
   set('vision-count', latestCount === null || latestCount === undefined ? '—' : String(latestCount));
   set('vision-total', visionFresh ? String(field(vision.session_detection_count, vision.total_detections, '—')) : '—');
-  set('vision-latency', visionFresh ? number(field(vision.inference_latency_ms, vision.latency_ms)) + ' ms' : '—');
+  set('vision-latency', visionFresh ? number(field(vision.inference_latency_ms, vision.inference_ms, vision.latency_ms)) + ' ms' : '—');
   set('vision-camera', demo ? 'READY' : online && vision.pipeline_ready === true ? 'PIPELINE READY' : visionFresh ? String(field(vision.camera_state, vision.camera_status, 'UNKNOWN')) : 'UNKNOWN');
-  set('vision-recording', visionFresh ? String(field(vision.recording_state, vision.recording, 'UNKNOWN')) : 'UNKNOWN');
+  const recording = field(vision.recording_state, vision.recording_enabled, vision.recording);
+  set('vision-recording', visionFresh && recording !== undefined ? typeof recording === 'boolean' ? recording ? 'ON' : 'OFF' : String(recording) : 'UNKNOWN');
   set('diag-manager', observed);
   set('diag-api', demo ? 'DEMO' : online ? 'ONLINE' : 'OFFLINE');
   set('diag-session', String(field(status?.esp?.session_id, status?.esp_session_id, metadata?.esp_session_id, '—')));
@@ -208,7 +210,9 @@ function info() {
   const countdown = pred.nextAt ? duration((pred.nextAt - now) / 1000) : '—';
   set('countdown', countdown);
   set('transition-utc', pred.nextAt ? `${pred.nextAction?.toUpperCase()} · ${utc(pred.nextAt)}` : 'Awaiting schedule');
-  set('schedule-banner', scheduleOrigin === 'verified' ? 'Verified against the current ESP session' : scheduleOrigin === 'cache' ? 'Last verified schedule · Current firmware unconfirmed' : scheduleOrigin === 'published' ? 'Published snapshot · Current firmware unverified' : demo ? 'Simulated operating windows' : 'No verified schedule available');
+  set('schedule-banner', schedule?.mode === 'BENCH_ONE_SHOT'
+    ? `BENCH ONE-SHOT · ${scheduleOrigin === 'verified' ? 'Verified current ESP session' : 'Unverified / last known'} · Not a recurring production schedule`
+    : scheduleOrigin === 'verified' ? 'Verified against the current ESP session' : scheduleOrigin === 'cache' ? 'Last verified schedule · Current firmware unconfirmed' : scheduleOrigin === 'published' ? 'Published snapshot · Current firmware unverified' : demo ? 'Simulated operating windows' : 'No verified schedule available');
   set('global-connection', demo ? 'SIMULATED' : online ? 'NODE CONNECTED' : 'NOT CONNECTED');
   $('global-connection').classList.toggle('is-online', online && !demo);
   set('data-mode', demo ? 'DEMO DATA' : online ? 'LIVE CONNECTION' : 'NO LIVE DATA');
@@ -222,29 +226,51 @@ function info() {
 function drawSchedule() {
   const el = $('schedule-strip');
   el.replaceChildren();
-  const windows = schedule?.windows ?? schedule?.daily_windows ?? [];
-  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) { el.textContent = 'No active UTC windows available'; return; }
+  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) {
+    el.textContent = 'No active UTC windows available';
+    return;
+  }
+  const bench = schedule.mode === 'BENCH_ONE_SHOT';
+  const boot = bench ? schedule.esp_boot_epoch_utc! * 1000 : 0;
   const today = new Date();
   const midnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const startOfDay = midnight - 86400000;
-  const endOfDay = midnight + 86400000;
-  for (const offset of [-1, 0]) {
-    for (const win of windows) {
-      const start = (win.start_utc ?? win.start ?? '00:00').split(':').map(Number);
-      const end = (win.end_utc ?? win.end ?? '00:00').split(':').map(Number);
-      const a = midnight + offset * 86400000 + (start[0] * 60 + start[1]) * 60000;
-      const b = midnight + offset * 86400000 + (end[0] * 60 + end[1]) * 60000 + ((end[0] * 60 + end[1]) < (start[0] * 60 + start[1]) ? 86400000 : 0);
-      const left = Math.max(a, midnight), right = Math.min(b, endOfDay);
-      if (right <= left) continue;
-      const slot = document.createElement('span'); slot.className = 'slot';
-      slot.style.left = `${(left - midnight) / 864000}%`;
-      slot.style.width = `${(right - left) / 864000}%`;
-      el.append(slot);
+  const startOfView = bench ? boot : midnight;
+  const endOfView = bench ? boot + schedule.end_at_ms! : midnight + 86400000;
+  const addSlot = (start: number, end: number) => {
+    const left = Math.max(start, startOfView), right = Math.min(end, endOfView);
+    if (right <= left) return;
+    const slot = document.createElement('span');
+    slot.className = 'slot';
+    slot.style.left = `${((left - startOfView) / (endOfView - startOfView)) * 100}%`;
+    slot.style.width = `${((right - left) / (endOfView - startOfView)) * 100}%`;
+    el.append(slot);
+  };
+  if (bench) {
+    addSlot(boot, boot + schedule.shutdown_at_ms!);
+    addSlot(boot + schedule.wake_at_ms!, boot + schedule.end_at_ms!);
+  } else {
+    const windows = schedule.windows ?? schedule.daily_windows ?? [];
+    for (const offset of [-1, 0]) {
+      for (const win of windows) {
+        const start = (win.start_utc ?? win.start ?? '00:00').split(':').map(Number);
+        const end = (win.end_utc ?? win.end ?? '00:00').split(':').map(Number);
+        const a = midnight + offset * 86400000 + (start[0] * 60 + start[1]) * 60000;
+        const b = midnight + offset * 86400000 + (end[0] * 60 + end[1]) * 60000 + ((end[0] * 60 + end[1]) < (start[0] * 60 + start[1]) ? 86400000 : 0);
+        addSlot(a, b);
+      }
     }
   }
-  const cursor = document.createElement('span'); cursor.className = 'cursor';
-  cursor.style.left = `${((Date.now() - midnight) / 86400000) * 100}%`; el.append(cursor);
-  const caption = document.createElement('span'); caption.className = 'slot-label'; caption.textContent = '00:00 — 24:00 UTC'; el.append(caption);
+  const fraction = (Date.now() - startOfView) / (endOfView - startOfView);
+  if (fraction >= 0 && fraction <= 1) {
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    cursor.style.left = `${fraction * 100}%`;
+    el.append(cursor);
+  }
+  const caption = document.createElement('span');
+  caption.className = 'slot-label';
+  caption.textContent = bench ? `BENCH ONE-SHOT · ${utc(boot)} to ${utc(endOfView)}` : '00:00 — 24:00 UTC';
+  el.append(caption);
 }
 function drawPower() {
   const el = $('power-plot');
