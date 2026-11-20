@@ -208,7 +208,9 @@ function info() {
   const countdown = pred.nextAt ? duration((pred.nextAt - now) / 1000) : '—';
   set('countdown', countdown);
   set('transition-utc', pred.nextAt ? `${pred.nextAction?.toUpperCase()} · ${utc(pred.nextAt)}` : 'Awaiting schedule');
-  set('schedule-banner', scheduleOrigin === 'verified' ? 'Verified against the current ESP session' : scheduleOrigin === 'cache' ? 'Last verified schedule · Current firmware unconfirmed' : scheduleOrigin === 'published' ? 'Published snapshot · Current firmware unverified' : demo ? 'Simulated operating windows' : 'No verified schedule available');
+  set('schedule-banner', schedule?.mode === 'BENCH_ONE_SHOT'
+    ? `BENCH ONE-SHOT · ${scheduleOrigin === 'verified' ? 'Verified current ESP session' : 'Unverified / last known'} · Not a recurring production schedule`
+    : scheduleOrigin === 'verified' ? 'Verified against the current ESP session' : scheduleOrigin === 'cache' ? 'Last verified schedule · Current firmware unconfirmed' : scheduleOrigin === 'published' ? 'Published snapshot · Current firmware unverified' : demo ? 'Simulated operating windows' : 'No verified schedule available');
   set('global-connection', demo ? 'SIMULATED' : online ? 'NODE CONNECTED' : 'NOT CONNECTED');
   $('global-connection').classList.toggle('is-online', online && !demo);
   set('data-mode', demo ? 'DEMO DATA' : online ? 'LIVE CONNECTION' : 'NO LIVE DATA');
@@ -222,29 +224,51 @@ function info() {
 function drawSchedule() {
   const el = $('schedule-strip');
   el.replaceChildren();
-  const windows = schedule?.windows ?? schedule?.daily_windows ?? [];
-  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) { el.textContent = 'No active UTC windows available'; return; }
+  if (!schedule || !isValidSchedule(schedule) || !schedule.enabled) {
+    el.textContent = 'No active UTC windows available';
+    return;
+  }
+  const bench = schedule.mode === 'BENCH_ONE_SHOT';
+  const boot = bench ? schedule.esp_boot_epoch_utc! * 1000 : 0;
   const today = new Date();
   const midnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
-  const startOfDay = midnight - 86400000;
-  const endOfDay = midnight + 86400000;
-  for (const offset of [-1, 0]) {
-    for (const win of windows) {
-      const start = (win.start_utc ?? win.start ?? '00:00').split(':').map(Number);
-      const end = (win.end_utc ?? win.end ?? '00:00').split(':').map(Number);
-      const a = midnight + offset * 86400000 + (start[0] * 60 + start[1]) * 60000;
-      const b = midnight + offset * 86400000 + (end[0] * 60 + end[1]) * 60000 + ((end[0] * 60 + end[1]) < (start[0] * 60 + start[1]) ? 86400000 : 0);
-      const left = Math.max(a, midnight), right = Math.min(b, endOfDay);
-      if (right <= left) continue;
-      const slot = document.createElement('span'); slot.className = 'slot';
-      slot.style.left = `${(left - midnight) / 864000}%`;
-      slot.style.width = `${(right - left) / 864000}%`;
-      el.append(slot);
+  const startOfView = bench ? boot : midnight;
+  const endOfView = bench ? boot + schedule.end_at_ms! : midnight + 86400000;
+  const addSlot = (start: number, end: number) => {
+    const left = Math.max(start, startOfView), right = Math.min(end, endOfView);
+    if (right <= left) return;
+    const slot = document.createElement('span');
+    slot.className = 'slot';
+    slot.style.left = `${((left - startOfView) / (endOfView - startOfView)) * 100}%`;
+    slot.style.width = `${((right - left) / (endOfView - startOfView)) * 100}%`;
+    el.append(slot);
+  };
+  if (bench) {
+    addSlot(boot, boot + schedule.shutdown_at_ms!);
+    addSlot(boot + schedule.wake_at_ms!, boot + schedule.end_at_ms!);
+  } else {
+    const windows = schedule.windows ?? schedule.daily_windows ?? [];
+    for (const offset of [-1, 0]) {
+      for (const win of windows) {
+        const start = (win.start_utc ?? win.start ?? '00:00').split(':').map(Number);
+        const end = (win.end_utc ?? win.end ?? '00:00').split(':').map(Number);
+        const a = midnight + offset * 86400000 + (start[0] * 60 + start[1]) * 60000;
+        const b = midnight + offset * 86400000 + (end[0] * 60 + end[1]) * 60000 + ((end[0] * 60 + end[1]) < (start[0] * 60 + start[1]) ? 86400000 : 0);
+        addSlot(a, b);
+      }
     }
   }
-  const cursor = document.createElement('span'); cursor.className = 'cursor';
-  cursor.style.left = `${((Date.now() - midnight) / 86400000) * 100}%`; el.append(cursor);
-  const caption = document.createElement('span'); caption.className = 'slot-label'; caption.textContent = '00:00 — 24:00 UTC'; el.append(caption);
+  const fraction = (Date.now() - startOfView) / (endOfView - startOfView);
+  if (fraction >= 0 && fraction <= 1) {
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    cursor.style.left = `${fraction * 100}%`;
+    el.append(cursor);
+  }
+  const caption = document.createElement('span');
+  caption.className = 'slot-label';
+  caption.textContent = bench ? `BENCH ONE-SHOT · ${utc(boot)} to ${utc(endOfView)}` : '00:00 — 24:00 UTC';
+  el.append(caption);
 }
 function drawPower() {
   const el = $('power-plot');
