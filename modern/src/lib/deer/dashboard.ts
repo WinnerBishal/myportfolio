@@ -206,7 +206,7 @@ function info() {
   $('data-mode').classList.toggle('is-demo', demo);
   set('demo-toggle', demo ? 'Exit demo' : 'Enable demo');
   const notice = $('notification');
-  notice.textContent = demo ? 'DEMO DATA — All measurements and events are simulated. No connection to a field node.' : online ? (scheduleOrigin === 'verified' ? 'Private telemetry connected. ESP schedule verified for the current session.' : 'Private telemetry connected. Schedule not yet verified for the current ESP session.') : `Private node unreachable — connect to Tailscale for live telemetry. ${error ? error + '. ' : ''}Last reported readings are not live.`;
+  notice.textContent = demo ? 'DEMO DATA — All measurements and events are simulated. No connection to a field node.' : online ? (error ? `Jetson API reachable. ${error}.` : scheduleOrigin === 'verified' ? 'Private telemetry connected. ESP schedule verified for the current session.' : 'Private telemetry connected. Schedule not yet verified for the current ESP session.') : `Private node unreachable — connect to Tailscale for live telemetry. ${error ? error + '. ' : ''}Last reported readings are not live.`;
   if (manifestSchedule && schedule && scheduleVersion(manifestSchedule) !== scheduleVersion(schedule)) notice.textContent += ' SCHEDULE MISMATCH / VERIFY ON NEXT CONNECTION.';
   drawSchedule();
 }
@@ -336,25 +336,42 @@ async function connect() {
   if (requestInFlight || !endpoint || demo || !pageVisible) return;
   requestInFlight = true;
   try {
-    const [health, meta, snap] = await Promise.all([request('/health'), request('/meta'), request('/status')]);
-    const serverTime = parseTime(field(health.server_time_utc, snap.server_time_utc));
+    const health = await request('/health');
+    if (health.status !== 'ok') throw new Error('API health is not OK');
+    const serverTime = parseTime(health.server_time_utc);
     if (serverTime) clockDelta = serverTime - Date.now();
-    if (!snap || typeof snap !== 'object') throw new Error('Missing status snapshot');
-    metadata = meta;
-    status = snap;
-    liveScheduleVersion = clean(field(snap.schedule_version, meta.schedule_version)) || null;
-    online = true; failures = 0; error = ''; lastResponse = Date.now(); lastStatusPoll = Date.now();
-    if (scheduleOrigin !== 'verified' || previousScheduleVersion !== liveScheduleVersion || Date.now() - lastSchedulePoll > 60000) {
-      try { await syncSchedule(); } catch (e) {
-        if (scheduleOrigin === 'verified') scheduleOrigin = 'cache';
-        error = e instanceof Error ? e.message : 'Schedule verification failed';
+    online = true;
+    failures = 0;
+    error = '';
+    lastResponse = Date.now();
+    lastStatusPoll = Date.now();
+
+    const results = await Promise.allSettled([request('/meta'), request('/status')]);
+    const meta = results[0].status === 'fulfilled' ? results[0].value : null;
+    const snap = results[1].status === 'fulfilled' ? results[1].value : null;
+    if (meta) metadata = meta;
+    if (snap) status = snap;
+
+    if (!snap) {
+      error = 'API reachable, but /status is unavailable';
+    } else {
+      liveScheduleVersion = clean(field(snap.schedule_version, meta?.schedule_version, metadata?.schedule_version)) || null;
+      if (scheduleOrigin !== 'verified' || previousScheduleVersion !== liveScheduleVersion || Date.now() - lastSchedulePoll > 60000) {
+        try { await syncSchedule(); } catch (e) {
+          if (scheduleOrigin === 'verified') scheduleOrigin = 'cache';
+          error = e instanceof Error ? e.message : 'Schedule verification failed';
+        }
+        lastSchedulePoll = Date.now();
       }
-      lastSchedulePoll = Date.now();
     }
     persist();
   } catch (e) {
-    online = false; failures++;
-    error = e instanceof Error ? (e.name === 'AbortError' ? 'API timeout' : e.message) : 'Connection failed';
+    online = false;
+    failures++;
+    const message = e instanceof Error ? e.message : 'Connection failed';
+    error = message === 'Failed to fetch' || message === 'Load failed' || message === 'NetworkError when attempting to fetch resource.'
+      ? 'Browser fetch blocked or unreachable — check CORS, Tailscale, and browser Network tab'
+      : e instanceof Error && e.name === 'AbortError' ? 'API timeout' : message;
   } finally { requestInFlight = false; render(); }
 }
 async function history() {
