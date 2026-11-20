@@ -251,7 +251,7 @@ function drawPower() {
     const fragments: PowerPoint[][] = [];
     for (const p of visible) {
       const last = fragments[fragments.length - 1];
-      const gap = last && p.t - last[last.length - 1].t > Math.max(120000, powerHours * 3600000 / 40);
+      const gap = last && last.length > 0 && p.t - last[last.length - 1].t > Math.max(120000, powerHours * 3600000 / 40);
       if (p.watts === null) { fragments.push([]); continue; }
       if (!last || gap) fragments.push([p]);
       else last.push(p);
@@ -276,7 +276,10 @@ function drawPower() {
 }
 function drawEvents() {
   const el = $('event-timeline'); el.replaceChildren();
-  const ordered = [...events].sort((a, b) => (parseTime(field(b.observed_at_utc, b.timestamp_utc, b.time_utc)) ?? 0) - (parseTime(field(a.observed_at_utc, a.timestamp_utc, a.time_utc)) ?? 0));
+  const ordered = [...events].sort((a, b) => {
+    if (a.time_trusted === false || b.time_trusted === false) return 0;
+    return (parseTime(field(b.observed_at_utc, b.timestamp_utc, b.time_utc)) ?? 0) - (parseTime(field(a.observed_at_utc, a.timestamp_utc, a.time_utc)) ?? 0);
+  });
   for (const e of ordered.slice(0, 60)) {
     const item = document.createElement('li');
     const time = document.createElement('time'); time.textContent = utc(field(e.observed_at_utc, e.timestamp_utc, e.time_utc) as string);
