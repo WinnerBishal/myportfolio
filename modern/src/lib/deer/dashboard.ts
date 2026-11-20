@@ -12,7 +12,8 @@ const field = (...values: unknown[]) => values.find((v) => v !== null && v !== u
 const parseTime = (v: unknown) => typeof v === 'string' && Number.isFinite(Date.parse(v)) ? Date.parse(v) : null;
 const ageText = (t: number | null) => t === null ? 'No confirmed contact' : `Last measurement ${duration((Date.now() - t) / 1000)} ago · ${utc(t)}`;
 const clean = (value: unknown) => typeof value === 'string' ? value : '';
-let endpoint = localStorage.getItem(KEYS.endpoint) ?? '';
+const DEFAULT_ENDPOINT = 'https://edge.tail90fc2a.ts.net/api/v1';
+let endpoint = localStorage.getItem(KEYS.endpoint) ?? DEFAULT_ENDPOINT;
 let demo = sessionStorage.getItem(KEYS.demo) === 'yes';
 let online = false;
 let lastResponse: number | null = null;
