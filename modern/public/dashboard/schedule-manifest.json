@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "node_id": "node-01",
+  "schedule": null,
+  "published_at_utc": null,
+  "source": "published_snapshot",
+  "note": "The production ESP operating windows have not been verified. This manifest deliberately contains no invented schedule."
+}
